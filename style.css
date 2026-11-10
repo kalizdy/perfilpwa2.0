@@ -986,6 +986,50 @@ h1, h2, h3,
 }
 
 /* ==========================================================
+   ÉNFASO VISUAL DE ENFOQUE (focus) — requisito de la guía:
+   los campos y botones se resaltan al recibir el foco.
+   ========================================================== */
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+  border-color: var(--marca);
+  box-shadow: 0 0 0 0.18rem rgba(37, 99, 235, 0.25);
+  outline: 0;
+}
+
+/* Validación con matiz también al enfocar (verde/rojo como Bootstrap) */
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+  border-color: #1a7f37;
+  box-shadow: 0 0 0 0.18rem rgba(25, 135, 84, 0.25);
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.18rem rgba(220, 53, 69, 0.25);
+}
+
+/* Estado de "aún no hidratado": se ve, pero no responde */
+.no-hidratado {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(0.4);
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.btn:focus-visible,
+.rail-btn:focus-visible,
+.abajo-cta:focus-visible,
+.btn-top:focus-visible,
+.btn-volver:focus-visible,
+.redes a:focus-visible,
+.abajo-tab:focus-visible {
+  outline: 2px solid var(--marca-2);
+  outline-offset: 2px;
+}
+
+/* ==========================================================
    PANTALLA ACOSTADA (CELULAR Y TABLETA BAJA):
    MISMA ESTRUCTURA QUE LA LAPTOP, PERO COMPACTA
    ========================================================== */

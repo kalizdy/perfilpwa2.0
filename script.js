@@ -1032,8 +1032,17 @@ function prepararLobby() {
   var panel = document.getElementById("panelLateral");
   if (!panel) return;
 
-  var botones = document.querySelectorAll("[data-panel]");
-  var seccionActiva = null; // nombre de la sección mostrada
+  /* === HIDRATACIÓN (guía: arquitectura frontend avanzada) ===
+     La página carga primero con la interfaz estática (rápida),
+     y js "hidrata" conectando los eventos sin redibujar nada.
+     El guard equivale al .off() antes del .on() de jQuery:
+     impide enganchar escuchadores más de una vez (fugas de memoria). */
+  function hidratarInterfaz() {
+    if (panel.dataset.hidratado === "true") return; // ya hidratado
+    panel.dataset.hidratado = "true";
+
+    var botones = document.querySelectorAll("[data-panel]");
+    var seccionActiva = null; // nombre de la sección mostrada
 
   function abrirSeccion(nombre) {
     var destino = document.getElementById(nombre);
@@ -1101,4 +1110,14 @@ function prepararLobby() {
 
     cerrarPanel();
   });
+
+    // La interfaz pasa de estática a interactiva: se quita el candado
+    document.querySelectorAll(".no-hidratado").forEach(function (elemento) {
+      elemento.classList.remove("no-hidratado");
+      elemento.removeAttribute("aria-disabled");
+    });
+  }
+
+  // Primero se ve estática… y casi al instante se hidrata (como el setTimeout de la guía)
+  setTimeout(hidratarInterfaz, 400);
 }
