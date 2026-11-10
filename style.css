@@ -1129,10 +1129,202 @@ h1, h2, h3,
   }
 
   .galeria-artistas {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
 
   .juegos-lista {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ==========================================================
+   PANEL COMPACTO PARA PANTALLA ACOSTADA:
+   contenido a 2 columnas y scroll visible
+   ========================================================== */
+@media (orientation: landscape) and (max-height: 520px) {
+
+  /* Panel más grande: ocupa casi toda la pantalla útil */
+  .panel-flotante {
+    width: min(600px, calc(100% - 116px));
+    top: 4px;
+    bottom: 4px;
+    right: 4px;
+  }
+
+  .panel-cab .btn-top {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+
+  .panel-scroll {
+    padding: 8px 12px 10px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .panel-scroll::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .panel-scroll::-webkit-scrollbar-thumb {
+    background: rgba(37, 99, 235, 0.55);
+    border-radius: 999px;
+  }
+
+  .panel-cab {
+    padding: 4px 8px 0;
+  }
+
+  .panel-titulo {
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+  }
+
+  /* Tarjetas a 2 columnas */
+  .tarjetas-mini {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+
+  .mini-card {
+    padding: 7px;
+    gap: 8px;
+  }
+
+  .mini-card img {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-radius: 9px;
+  }
+
+  .mini-datos h3 {
+    font-size: 0.76rem;
+  }
+
+  .mini-datos p {
+    font-size: 0.66rem;
+  }
+
+  .juegos-lista {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+
+  .juego-card {
+    padding: 7px;
+    gap: 8px;
+  }
+
+  .juego-card img {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    border-radius: 9px;
+  }
+
+  .juego-datos h3 {
+    font-size: 0.78rem;
+  }
+
+  .juego-datos p {
+    font-size: 0.66rem;
+  }
+
+  /* Artistas en 5 columnas: 9 artistas caben en 2 filas */
+  .galeria-artistas {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+
+  .artista-nombre {
+    left: 7px;
+    right: 7px;
+    bottom: 18px;
+    font-size: 0.64rem;
+  }
+
+  .artista-cantidad {
+    left: 7px;
+    bottom: 4px;
+    font-size: 0.46rem;
+  }
+
+  .mensaje-filtro {
+    font-size: 0.7rem;
+    margin: 0 0 6px;
+  }
+
+  .lista-musica .list-group-item {
+    padding: 4px 8px;
+    font-size: 0.76rem;
+  }
+
+  .lista-musica .portada {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border-radius: 7px;
+  }
+
+  .hoja-horario {
+    height: 170px;
+  }
+
+  /* Formulario a 2 columnas e inputs bajitos */
+  .formulario {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+    row-gap: 5px;
+    align-items: start;
+  }
+
+  .formulario .mb-2 {
+    margin-bottom: 0 !important;
+  }
+
+  .formulario .form-label {
+    font-size: 0.64rem;
+    margin-bottom: 0;
+  }
+
+  .formulario .form-control,
+  .formulario .form-select {
+    font-size: 0.72rem;
+    padding: 0.18rem 0.45rem;
+  }
+
+  .formulario textarea.form-control {
+    min-height: 34px;
+  }
+
+  /* El mensaje comparte fila con el tema; los botones van juntos abajo */
+  .formulario .c-mensaje {
+    grid-column: auto;
+  }
+
+  .formulario .c-botones,
+  .formulario .row,
+  .panel-seccion .alert,
+  .formulario .resumen-contacto {
+    grid-column: 1 / -1;
+  }
+
+  .panel-seccion .alert {
+    padding: 5px 10px;
+    font-size: 0.68rem;
+    margin-top: 6px;
+  }
+
+  .resumen-contacto {
+    padding: 8px;
+  }
+
+  .resumen-texto {
+    font-size: 0.68rem;
+    margin-bottom: 6px;
   }
 }

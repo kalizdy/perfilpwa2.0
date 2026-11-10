@@ -34,7 +34,7 @@
   <!-- Iconos de Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <!-- Mi hoja de estilos -->
-  <link rel="stylesheet" href="style.css?v=lobby4">
+  <link rel="stylesheet" href="style.css?v=lobby5">
 </head>
 <body>
 
@@ -281,14 +281,14 @@
           <h2 class="panel-titulo"><i class="bi bi-send"></i>Contáctame</h2>
 
           <form id="formContacto" class="formulario" novalidate>
-            <div class="mb-2">
+            <div class="mb-2 c-nombre">
               <label for="conNombre" class="form-label">Nombre completo</label>
               <input type="text" class="form-control form-control-sm" id="conNombre" maxlength="60"
                      placeholder="Ej. Ana Torres Quispe" autocomplete="name">
               <div class="invalid-feedback">Falta llenar tu nombre completo.</div>
             </div>
 
-            <div class="mb-2">
+            <div class="mb-2 c-correo">
               <label for="conCorreo" class="form-label">Correo electrónico</label>
               <input type="email" class="form-control form-control-sm" id="conCorreo" maxlength="80"
                      placeholder="tucorreo@ejemplo.com" autocomplete="email">
@@ -316,7 +316,7 @@
               </div>
             </div>
 
-            <div class="mb-2">
+            <div class="mb-2 c-tema">
               <label for="conTema" class="form-label">¿Sobre qué tema?</label>
               <select class="form-select form-select-sm" id="conTema">
                 <option value="">Elige el motivo…</option>
@@ -324,7 +324,7 @@
               <div class="invalid-feedback">Falta elegir el tema.</div>
             </div>
 
-            <div class="mb-2">
+            <div class="mb-2 c-mensaje">
               <label for="conMensaje" class="form-label">
                 Mensaje <span id="contadorMensaje" class="texto-ayuda">0/300</span>
               </label>
@@ -333,7 +333,7 @@
               <div class="invalid-feedback">Falta escribir tu mensaje.</div>
             </div>
 
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 c-botones">
               <button type="submit" class="btn btn-primary btn-sm flex-fill">
                 <i class="bi bi-send me-1"></i>Preparar
               </button>
