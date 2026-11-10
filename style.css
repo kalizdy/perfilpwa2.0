@@ -884,9 +884,9 @@ h1, h2, h3,
 }
 
 /* ==========================================================
-   CELULARES Y TABLETAS PEQUEÑAS (< 769px): TODO VERTICAL
+   CELULARES EN VERTICAL (< 769px): TODO APILADO
    ========================================================== */
-@media (max-width: 768.98px) {
+@media (max-width: 768.98px) and (orientation: portrait) {
   .barra-top {
     padding: 8px 10px;
     flex-wrap: nowrap;
@@ -982,5 +982,157 @@ h1, h2, h3,
 
   .panel-flotante {
     width: min(400px, calc(100% - 90px - 12px));
+  }
+}
+
+/* ==========================================================
+   PANTALLA ACOSTADA (CELULAR Y TABLETA BAJA):
+   MISMA ESTRUCTURA QUE LA LAPTOP, PERO COMPACTA
+   ========================================================== */
+@media (orientation: landscape) and (max-height: 520px) {
+
+  /* Barras más delgadas para ganar pantalla */
+  .barra-top {
+    padding: 6px 14px;
+  }
+
+  .jugador-foto {
+    width: 38px;
+    height: 38px;
+  }
+
+  .jugador-datos strong {
+    font-size: 0.85rem;
+  }
+
+  .jugador-saludo .saludo-dinamico {
+    font-size: 0.6rem;
+    padding: 3px 8px;
+  }
+
+  .chip-recurso {
+    padding: 3px 10px;
+    font-size: 0.66rem;
+  }
+
+  .btn-top {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  /* Personaje y placa compactos */
+  .escenario {
+    gap: 10px;
+  }
+
+  .personaje {
+    height: min(50vh, 320px);
+    border-radius: 20px;
+    border-width: 2px;
+  }
+
+  .placa-nombre {
+    padding: 6px 16px;
+    border-radius: 12px;
+  }
+
+  .placa-nombre h1 {
+    font-size: 0.82rem;
+  }
+
+  .placa-nombre p {
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* Barra inferior y frase más bajitas */
+  .barra-abajo {
+    padding: 6px 14px;
+  }
+
+  .abajo-cta {
+    padding: 7px 18px;
+    font-size: 0.78rem;
+  }
+
+  .abajo-pie .small {
+    font-size: 0.62rem;
+  }
+
+  .frase-flotante {
+    bottom: 58px;
+    padding: 5px 12px;
+    font-size: 0.68rem;
+  }
+
+  /* Panel pegado a los bordes y un poco más angosto */
+  .panel-flotante {
+    top: 8px;
+    bottom: 8px;
+    right: 8px;
+  }
+
+  .panel-titulo {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+
+  .hoja-horario {
+    height: 220px;
+  }
+
+  .panel-cab {
+    padding: 6px 8px 0;
+  }
+
+  .panel-scroll {
+    padding: 6px 14px 12px;
+  }
+}
+
+/* Ajustes SOLO cuando el ancho del acostado < 769px:
+   mostrar el rail aunque Bootstrap lo esconda y ocultar la hamburguesa */
+@media (max-width: 768.98px) and (orientation: landscape) {
+  .rail {
+    display: flex !important;
+    left: 8px;
+    padding: 8px 6px;
+    border-radius: 14px;
+  }
+
+  .rail-btn {
+    width: 56px;
+    padding: 6px 2px;
+  }
+
+  .rail-btn span {
+    font-size: 0.55rem;
+  }
+
+  .rail-btn i {
+    font-size: 0.9rem;
+  }
+
+  /* hamburguesa sobra cuando el rail ya se ve */
+  .top-acciones [data-bs-target="#menu"] {
+    display: none !important;
+  }
+
+  /* dejo espacio en la barra superior */
+  .jugador-saludo {
+    display: none;
+  }
+
+  .panel-flotante {
+    width: min(420px, calc(100% - 84px - 12px));
+  }
+
+  .galeria-artistas {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .juegos-lista {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
