@@ -1033,6 +1033,7 @@ function prepararLobby() {
   if (!panel) return;
 
   var botones = document.querySelectorAll("[data-panel]");
+  var seccionActiva = null; // nombre de la sección mostrada
 
   function abrirSeccion(nombre) {
     var destino = document.getElementById(nombre);
@@ -1045,22 +1046,21 @@ function prepararLobby() {
     destino.classList.remove("d-none");
 
     panel.classList.add("abierto");
-    document.body.setAttribute("data-panel", nombre);
+    seccionActiva = nombre;
 
     // Marco el botón activo (rail y barra inferior)
     document.querySelectorAll("[data-panel]").forEach(function (boton) {
       boton.classList.toggle("activo", boton.dataset.panel === nombre && !boton.classList.contains("nav-link"));
     });
 
-    // El panel y sus elementos ya quizá casi no se ven al abrir;
-    // al reabrir se revisa el contenido desde arriba.
+    // Al reabrir la sección, su contenido se ve desde arriba.
     var scrollPanel = panel.querySelector(".panel-scroll");
     if (scrollPanel) scrollPanel.scrollTop = 0;
   }
 
   function cerrarPanel() {
     panel.classList.remove("abierto");
-    document.body.setAttribute("data-panel", "");
+    seccionActiva = null;
     document.querySelectorAll("[data-panel]").forEach(function (boton) {
       boton.classList.remove("activo");
     });
@@ -1074,7 +1074,7 @@ function prepararLobby() {
       var nombre = evento.currentTarget.dataset.panel;
       if (!nombre) return;
 
-      var yaAbierto = document.body.getAttribute("data-panel") === nombre && panel.classList.contains("abierto");
+      var yaAbierto = seccionActiva === nombre && panel.classList.contains("abierto");
       if (yaAbierto) {
         cerrarPanel();
         return;
@@ -1095,6 +1095,7 @@ function prepararLobby() {
 
   document.addEventListener("click", function (evento) {
     if (!panel.classList.contains("abierto")) return;
+    if (!(evento.target instanceof Element)) return;
     if (panel.contains(evento.target)) return;
     if (evento.target.closest("[data-panel], .menu-caida")) return;
 
