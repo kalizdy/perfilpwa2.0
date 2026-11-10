@@ -12,7 +12,7 @@
   <meta name="description" content="Perfil personal de Deimar Yeri Quispe Ramos: pasatiempos, intereses, horario, música, juegos y contacto.">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Deimar Yeri">
 
@@ -34,7 +34,7 @@
   <!-- Iconos de Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <!-- Mi hoja de estilos -->
-  <link rel="stylesheet" href="style.css?v=lobby10">
+  <link rel="stylesheet" href="style.css?v=lobby15">
 </head>
 <body>
 
@@ -64,6 +64,9 @@
     </div>
 
     <div class="top-acciones">
+      <button id="botonHidratar" type="button" class="btn-top btn-hidratar" aria-label="Hidratar la página" title="Hidratar la página (demo)">
+        <i class="bi bi-droplet-half"></i><span class="txt-hidratar">Hidratar<span class="txt-largo"> la página</span></span>
+      </button>
       <button id="botonInstalar" type="button" class="btn-top d-none" aria-label="Instalar la aplicación">
         <i class="bi bi-download"></i>
       </button>
@@ -382,9 +385,14 @@
   </footer>
 
   <p class="frase-flotante"><i class="bi bi-quote"></i>“Hazlo simple, pero hazlo bien.”</p>
+
+  <!-- Aviso flotante de hidratación (se ve 2.6 s tras hidratar) -->
+  <div id="avisoHidratacion" class="aviso-hidratacion d-none" role="status">
+    <i class="bi bi-droplet-half"></i> Página hidratada ✓ — escuchadores conectados 1 vez (sin fugas)
+  </div>
 </div><!-- /.lobby -->
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="script.js?v=lobby10"></script>
+  <script src="script.js?v=lobby11"></script>
 </body>
 </html>

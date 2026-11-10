@@ -1030,6 +1030,105 @@ textarea.form-control:focus {
 }
 
 /* ==========================================================
+   BOTÓN DEMO "HIDRATAR LA PÁGINA" + AVISO FLOTANTE
+   (dos clases: gana al .btn-top que fuerza width 38px)
+   ========================================================== */
+.btn-top.btn-hidratar {
+  width: auto;                 /* el texto necesita ancho libre */
+  min-width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  padding: 0 0.72rem 0 0.58rem;
+  font-size: clamp(0.62rem, 1.3vw, 0.78rem);
+  font-weight: 600;
+  color: #e9f4ff;
+  white-space: nowrap;
+}
+
+.btn-hidratar i {
+  color: var(--marca-2);
+  font-size: 1rem;
+}
+
+.btn-hidratar:hover {
+  border-color: var(--marca-2);
+  color: #ffffff;
+}
+
+/* Vertical de celular: versión compacta (queda DESPUÉS del base
+   para que gane y la barra superior no se desborde en 360–430px) */
+@media (max-width: 768.98px) and (orientation: portrait) {
+  .barra-top {
+    gap: 8px;
+  }
+
+  /* El texto completo no cabe: en vertical basta "Hidratar" */
+  .btn-hidratar .txt-largo {
+    display: none;
+  }
+
+  .btn-top.btn-hidratar {
+    height: 32px;
+    padding: 0 0.42rem 0 0.36rem;
+    gap: 0.2rem;
+    font-size: 0.6rem;
+  }
+
+  .btn-hidratar i {
+    font-size: 0.88rem;
+  }
+
+  /* Fila del jugador más angosta para dar sitio a los botones */
+  .jugador-foto {
+    width: 34px;
+    height: 34px;
+  }
+
+  .jugador-datos strong {
+    font-size: 0.78rem;
+  }
+
+  .jugador-datos small {
+    font-size: 0.58rem;
+  }
+}
+
+.aviso-hidratacion {
+  position: fixed;
+  left: 50%;
+  bottom: 4.4rem;
+  transform: translateX(-50%) translateY(0.6rem);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: min(92vw, 430px);
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(11, 18, 32, 0.88);
+  color: #eaf6ff;
+  font-size: 0.74rem;
+  font-weight: 500;
+  border: 1px solid var(--marca-2);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.aviso-hidratacion:not(.d-none) {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.aviso-hidratacion i {
+  color: var(--marca-2);
+}
+
+/* ==========================================================
    PANTALLA ACOSTADA (CELULAR Y TABLETA BAJA):
    MISMA ESTRUCTURA QUE LA LAPTOP, PERO COMPACTA
    ========================================================== */

@@ -1032,92 +1032,151 @@ function prepararLobby() {
   var panel = document.getElementById("panelLateral");
   if (!panel) return;
 
+  var seccionActiva = null;   // nombre de la sección mostrada
+  var eventosConectados = false;
+  var demoEnMarcha = false;
+
   /* === HIDRATACIÓN (guía: arquitectura frontend avanzada) ===
      La página carga primero con la interfaz estática (rápida),
-     y js "hidrata" conectando los eventos sin redibujar nada.
+     y JS "hidrata" conectando los eventos sin redibujar nada.
      El guard equivale al .off() antes del .on() de jQuery:
-     impide enganchar escuchadores más de una vez (fugas de memoria). */
-  function hidratarInterfaz() {
-    if (panel.dataset.hidratado === "true") return; // ya hidratado
-    panel.dataset.hidratado = "true";
+     conecta los escuchadores UNA sola vez en toda la vida de la
+     página (aunque se pulse el botón "Hidratar la página" mil
+     veces) → sin fugas de memoria. */
 
+  function conectarEventos() {
+    if (eventosConectados) return; // guard anti fuga: ya están conectados
+    eventosConectados = true;
+
+    // Escuchadores del panel (se registran una sola vez)
     var botones = document.querySelectorAll("[data-panel]");
-    var seccionActiva = null; // nombre de la sección mostrada
 
-  function abrirSeccion(nombre) {
-    var destino = document.getElementById(nombre);
-    if (!destino) return;
+    function abrirSeccion(nombre) {
+      var destino = document.getElementById(nombre);
+      if (!destino) return;
 
-    // Se muestra solo la sección elegida
-    document.querySelectorAll(".panel-seccion").forEach(function (seccion) {
-      if (seccion !== destino) seccion.classList.add("d-none");
+      // Se muestra solo la sección elegida
+      document.querySelectorAll(".panel-seccion").forEach(function (seccion) {
+        if (seccion !== destino) seccion.classList.add("d-none");
+      });
+      destino.classList.remove("d-none");
+
+      panel.classList.add("abierto");
+      seccionActiva = nombre;
+
+      // Marco el botón activo (rail y barra inferior)
+      document.querySelectorAll("[data-panel]").forEach(function (boton) {
+        boton.classList.toggle("activo", boton.dataset.panel === nombre && !boton.classList.contains("nav-link"));
+      });
+
+      // Al reabrir la sección, su contenido se ve desde arriba.
+      var scrollPanel = panel.querySelector(".panel-scroll");
+      if (scrollPanel) scrollPanel.scrollTop = 0;
+    }
+
+    function cerrarPanel() {
+      panel.classList.remove("abierto");
+      seccionActiva = null;
+      document.querySelectorAll("[data-panel]").forEach(function (boton) {
+        boton.classList.remove("activo");
+      });
+    }
+
+    botones.forEach(function (boton) {
+      if (boton.id === "cerrarPanel" || boton === document.body) return;
+      boton.addEventListener("click", function (evento) {
+        evento.preventDefault();
+
+        var nombre = evento.currentTarget.dataset.panel;
+        if (!nombre) return;
+
+        var yaAbierto = seccionActiva === nombre && panel.classList.contains("abierto");
+        if (yaAbierto) {
+          cerrarPanel();
+          return;
+        }
+
+        abrirSeccion(nombre);
+      });
     });
-    destino.classList.remove("d-none");
 
-    panel.classList.add("abierto");
-    seccionActiva = nombre;
+    // Botón X del panel
+    var cerrar = document.getElementById("cerrarPanel");
+    if (cerrar) cerrar.addEventListener("click", cerrarPanel);
 
-    // Marco el botón activo (rail y barra inferior)
-    document.querySelectorAll("[data-panel]").forEach(function (boton) {
-      boton.classList.toggle("activo", boton.dataset.panel === nombre && !boton.classList.contains("nav-link"));
+    // Cierre con Escape o al hacer clic fuera del panel
+    document.addEventListener("keydown", function (evento) {
+      if (evento.key === "Escape") cerrarPanel();
     });
 
-    // Al reabrir la sección, su contenido se ve desde arriba.
-    var scrollPanel = panel.querySelector(".panel-scroll");
-    if (scrollPanel) scrollPanel.scrollTop = 0;
+    document.addEventListener("click", function (evento) {
+      if (!panel.classList.contains("abierto")) return;
+      if (!(evento.target instanceof Element)) return;
+      if (panel.contains(evento.target)) return;
+      if (evento.target.closest("[data-panel], .menu-caida")) return;
+
+      cerrarPanel();
+    });
+
+    panel.abrirSeccion = abrirSeccion; // (uso interno de la demo)
   }
 
-  function cerrarPanel() {
-    panel.classList.remove("abierto");
-    seccionActiva = null;
-    document.querySelectorAll("[data-panel]").forEach(function (boton) {
-      boton.classList.remove("activo");
-    });
-  }
-
-  botones.forEach(function (boton) {
-    if (boton.id === "cerrarPanel" || boton === document.body) return;
-    boton.addEventListener("click", function (evento) {
-      evento.preventDefault();
-
-      var nombre = evento.currentTarget.dataset.panel;
-      if (!nombre) return;
-
-      var yaAbierto = seccionActiva === nombre && panel.classList.contains("abierto");
-      if (yaAbierto) {
-        cerrarPanel();
-        return;
-      }
-
-      abrirSeccion(nombre);
-    });
-  });
-
-  // Botón X del panel
-  var cerrar = document.getElementById("cerrarPanel");
-  if (cerrar) cerrar.addEventListener("click", cerrarPanel);
-
-  // Cierre con Escape o al hacer clic fuera del panel
-  document.addEventListener("keydown", function (evento) {
-    if (evento.key === "Escape") cerrarPanel();
-  });
-
-  document.addEventListener("click", function (evento) {
-    if (!panel.classList.contains("abierto")) return;
-    if (!(evento.target instanceof Element)) return;
-    if (panel.contains(evento.target)) return;
-    if (evento.target.closest("[data-panel], .menu-caida")) return;
-
-    cerrarPanel();
-  });
+  function activarInterfaz() {
+    panel.dataset.hidratado = "true";
 
     // La interfaz pasa de estática a interactiva: se quita el candado
     document.querySelectorAll(".no-hidratado").forEach(function (elemento) {
       elemento.classList.remove("no-hidratado");
       elemento.removeAttribute("aria-disabled");
     });
+
+    mostrarAvisoHidratacion();
   }
 
-  // Primero se ve estática… y casi al instante se hidrata (como el setTimeout de la guía)
-  setTimeout(hidratarInterfaz, 400);
+  // Pone la interfaz en modo "estática" (para la demo visual)
+  function ponerEstatica() {
+    panel.dataset.hidratado = "false";
+    document.querySelectorAll(".rail-btn, .abajo-cta, .menu-lista").forEach(function (elemento) {
+      elemento.classList.add("no-hidratado");
+      elemento.setAttribute("aria-disabled", "true");
+    });
+  }
+
+  function mostrarAvisoHidratacion() {
+    var aviso = document.getElementById("avisoHidratacion");
+    if (!aviso) return;
+
+    clearTimeout(mostrarAvisoHidratacion.temporizador); // sin timers huérfanos
+    aviso.classList.remove("d-none");
+    mostrarAvisoHidratacion.temporizador = setTimeout(function () {
+      aviso.classList.add("d-none");
+    }, 2600);
+  }
+
+  // Carga normal: estática → hidratada a los 400 ms (como la guía)
+  setTimeout(function () {
+    conectarEventos(); // guard: solo la primera vez
+    activarInterfaz();
+  }, 400);
+
+  /* === BOTÓN DEMO "Hidratar la página" ===
+     Vuelve a mostrar el proceso completo delante del usuario:
+     interfaz estática → (600 ms) → hidratada. Los escuchadores
+     NO se duplican gracias al guard de conectarEventos(). */
+  var botonHidratar = document.getElementById("botonHidratar");
+  if (botonHidratar) {
+    botonHidratar.addEventListener("click", function () {
+      if (demoEnMarcha) return;
+      demoEnMarcha = true;
+
+      panel.classList.remove("abierto");
+      ponerEstatica();
+
+      setTimeout(function () {
+        conectarEventos(); // el guard evita duplicar escuchadores
+        activarInterfaz();
+        demoEnMarcha = false;
+      }, 600);
+    });
+  }
 }
