@@ -173,6 +173,7 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 0 1 auto;
 }
 
 .jugador-foto {
@@ -190,6 +191,15 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   flex-direction: column;
   line-height: 1.15;
   white-space: nowrap;
+  min-width: 0;
+}
+
+.jugador-datos strong,
+.jugador-datos small {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .jugador-datos strong {
@@ -285,7 +295,7 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   }
 }
 
-@media (max-width: 379.98px) {
+@media (max-width: 430.98px) {
   .carrera-corta {
     display: none;
   }
@@ -310,6 +320,7 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   align-items: center;
   gap: 8px;
   margin-left: auto; /* lleva los botones a la esquina derecha */
+  flex-shrink: 0;    /* nunca se recortan: tema e instalación siempre visibles */
 }
 
 /* El botón de tema queda siempre al final (esquina derecha) */
@@ -1536,21 +1547,38 @@ textarea.form-control:focus {
    para que gane y la barra superior no se desborde en 360–430px) */
 @media (max-width: 768.98px) and (orientation: portrait) {
   .barra-top {
-    gap: 8px;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  /* Los tres botones (descarga, hamburguesa y tema) siempre caben */
+  .top-acciones {
+    gap: 6px;
+  }
+
+  .top-acciones .btn-top {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
   }
 
   /* Fila del jugador más angosta para dar sitio a los botones */
+  .jugador {
+    gap: 8px;
+  }
+
   .jugador-foto {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
   }
 
   .jugador-datos strong {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
   }
 
   .jugador-datos small {
-    font-size: 0.58rem;
+    font-size: 0.56rem;
   }
 }
 
@@ -2170,5 +2198,62 @@ body:not([data-bs-theme="dark"]) .menu-lista .nav-link i {
 @media (orientation: landscape) and (max-height: 520px) {
   .top-acciones [data-bs-target="#menu"] {
     display: inline-flex !important;
+  }
+}
+
+/* Pantallas muy angostas (≤ 359 px): prioridad a los 3 botones */
+@media (max-width: 359.98px) and (orientation: portrait) {
+  .barra-top {
+    padding: 6px;
+    gap: 5px;
+  }
+
+  .top-acciones {
+    gap: 5px;
+  }
+
+  .jugador-datos small {
+    display: none;
+  }
+}
+
+/* ==========================================================
+   HORIZONTAL ESTRECHO (celulares acostados)
+   La barra de carrera se compacta para que quepan
+   descarga, hamburguesa y modo noche.
+   ========================================================== */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 768.98px) {
+  .carrera-larga {
+    display: none;
+  }
+
+  .carrera-corta {
+    display: inline;
+  }
+
+  .barra-carrera {
+    padding: 4px 8px;
+    font-size: 0.62rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 620px) {
+  .carrera-corta {
+    display: none;
+  }
+
+  .barra-carrera {
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 6px;
+  }
+
+  .carrera-progreso {
+    width: 46px;
+  }
+
+  .barra-top {
+    gap: 8px;
+    padding: 6px 10px;
   }
 }

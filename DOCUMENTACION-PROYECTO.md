@@ -83,7 +83,7 @@ La metáfora "lobby" reduce la sensación de página larga: todo está a un toqu
 | **Celular vertical (≤ 768 px, portrait)** | Estructura apilada: barra superior compacta, personaje centrado y panel tipo hoja. El rail se reemplaza por el menú hamburguesa. |
 | **Celular acostado (landscape, ≤ 520 px de alto)** | Se conserva la estructura de escritorio: rail visible con las 6 secciones, panel al costado derecho (sin tapar al personaje, que se desplaza a la izquierda al abrirse) y **menú hamburguesa disponible junto al botón de tema**. |
 
-Detalles de adaptación: tipografías fluidas con `clamp()`, chips que se ocultan en pantallas pequeñas, foto y textos del jugador reducidos en móvil, y botones con tamaño táctil adecuado.
+Detalles de adaptación: tipografías fluidas con `clamp()`, chips que se ocultan en pantallas pequeñas, foto y textos del jugador reducidos en móvil, y botones con tamaño táctil adecuado. La interfaz **se reacomoda al girar el teléfono** (vertical → apilado, horizontal → tipo escritorio) **sin recargar**, y el **zoom del navegador está habilitado** para que el usuario pueda acercar y desplazarse horizontal y verticalmente. En horizontal angosto, la barra de carrera se compacta para que siempre quepan descarga, hamburguesa y modo noche.
 
 ### 2.3 Interacción y navegación
 
