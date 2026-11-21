@@ -174,7 +174,7 @@ Comprobación real: la caché contiene 29 recursos, incluidos Bootstrap CSS/JS, 
 
 ### 3.4 Flujo Offline-First implementado
 
-1. El usuario llena el formulario y pulsa "Preparar".
+1. El usuario llena el formulario y pulsa "Enviar".
 2. Si **no hay red**, el mensaje se guarda en `localStorage` (`colaEnviosPerfil`) con estado `pendiente` y la UI muestra **"🟠 Guardado localmente — pendiente de envío"**.
 3. El chip inferior cambia a **"🟠 Offline — datos locales (n pendientes)"**.
 4. Al recuperar la conexión (`evento online`) o al recargar con red, la cola se reintenta: cada mensaje se envía por REST a **Supabase** (tabla `mensajes_contacto`); si el envío es exitoso queda `sincronizado`, aparece el aviso **"✓ Enviado — mensaje guardado en la nube"** y el estado pasa a **"🟢 Enviado — guardado en el servidor"**.
