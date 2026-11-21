@@ -81,7 +81,7 @@ La metáfora "lobby" reduce la sensación de página larga: todo está a un toqu
 |---|---|
 | **Escritorio / tablet (≥ 769 px)** | Rail visible a la izquierda + panel flotante a la derecha del personaje. Una sola pantalla sin scroll de página. |
 | **Celular vertical (≤ 768 px, portrait)** | Estructura apilada: barra superior compacta, personaje centrado y panel tipo hoja. El rail se reemplaza por el menú hamburguesa. |
-| **Celular acostado (landscape, ≤ 520 px de alto)** | Se conserva la estructura de escritorio: rail visible con las 6 secciones, hamburguesa oculta y panel al costado derecho (sin tapar al personaje, que se desplaza a la izquierda al abrirse), con paneles compactos y CTA más bajo. |
+| **Celular acostado (landscape, ≤ 520 px de alto)** | Se conserva la estructura de escritorio: rail visible con las 6 secciones, panel al costado derecho (sin tapar al personaje, que se desplaza a la izquierda al abrirse) y **menú hamburguesa disponible junto al botón de tema**. |
 
 Detalles de adaptación: tipografías fluidas con `clamp()`, chips que se ocultan en pantallas pequeñas, foto y textos del jugador reducidos en móvil, y botones con tamaño táctil adecuado.
 

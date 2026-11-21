@@ -346,6 +346,9 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   right: 14px;
   z-index: 60;
   width: 236px;
+  max-height: calc(100dvh - 76px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 6px;
   border-radius: 14px;
   background: rgba(8, 14, 30, 0.96);
@@ -1708,12 +1711,7 @@ textarea.form-control:focus {
     font-size: 0.9rem;
   }
 
-  /* hamburguesa sobra cuando el rail ya se ve */
-  .top-acciones [data-bs-target="#menu"] {
-    display: none !important;
-  }
-
-  /* dejo espacio en la barra superior */
+  /* la hamburguesa se mantiene visible también en horizontal */
   .jugador-saludo {
     display: none;
   }
@@ -2141,4 +2139,36 @@ body:not([data-bs-theme="dark"]) .barra-carrera {
 
 body:not([data-bs-theme="dark"]) .barra-carrera i {
   color: var(--marca);
+}
+
+/* Menú hamburguesa en modo día */
+body:not([data-bs-theme="dark"]) .menu-caida {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+}
+
+body:not([data-bs-theme="dark"]) .menu-lista .nav-link {
+  color: #334155;
+}
+
+body:not([data-bs-theme="dark"]) .menu-lista .nav-link:hover,
+body:not([data-bs-theme="dark"]) .menu-lista .nav-link.active {
+  background: rgba(37, 99, 235, 0.12);
+  color: #0f172a;
+}
+
+body:not([data-bs-theme="dark"]) .menu-lista .nav-link i {
+  color: var(--marca);
+}
+
+/* ==========================================================
+   HAMBURGUESA EN PANTALLA HORIZONTAL
+   Visible también en celulares acostados con ancho > 768 px,
+   junto al botón de modo noche.
+   ========================================================== */
+@media (orientation: landscape) and (max-height: 520px) {
+  .top-acciones [data-bs-target="#menu"] {
+    display: inline-flex !important;
+  }
 }
