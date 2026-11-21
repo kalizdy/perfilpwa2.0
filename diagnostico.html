@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnóstico PWA / DOM — Analizador de Código</title>
+  <!-- DOMPurify: limpia cualquier HTML antes de insertarlo en el DOM -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
+  <style>
+    /* Estilo inspirado en la guía del profe, en JavaScript puro (sin jQuery) */
+    body {
+      font-family: sans-serif;
+      background: #0f172a;
+      color: #fff;
+      padding: 15px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 140px;
+      background: #0f172a;
+      color: #fde047;
+      border: 1px solid #334155;
+      padding: 10px;
+      font-family: monospace;
+      box-sizing: border-box;
+      border-radius: 4px;
+    }
+
+    .btn {
+      background: #f97316;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      background: #ea580c;
+    }
+
+    .result {
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .badge-danger {
+      background: #ef4444;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .badge-success {
+      background: #22c55e;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    li {
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    h2 {
+      color: #f97316;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🔍 Diagnóstico de Código PWA &amp; Bloqueos DOM</h2>
+    <p style="font-size:12px; color:#cbd5e1;">
+      Pega tu código HTML/CSS abajo para detectar clases bloqueadas por Brave/Opera
+      o ineficiencias de memoria (versión en JavaScript puro — sin jQuery):
+    </p>
+    <textarea id="codigoInput" placeholder="Pega aquí tu HTML/CSS..."></textarea>
+    <p><button class="btn" id="btnAnalizar">Analizar y Optimizar Código</button></p>
+  </div>
+
+  <div id="panelResultado" class="box result">
+    <h3>Informe de Diagnóstico y Viabilidad:</h3>
+    <div id="detallesReporte" style="font-size:13px; margin:10px 0;"></div>
+    <h4 style="color:#f97316;">Código Sugerido/Optimizado:</h4>
+    <textarea id="codigoSugerido" readonly></textarea>
+  </div>
+
+  <script>
+    // Delegación también aquí: UN listener para el botón (y para Enter en el textarea)
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("btnAnalizar").addEventListener("click", analizar);
+    });
+
+    function analizar() {
+      var origen = document.getElementById("codigoInput");
+      var src = origen.value;
+
+      if (!src.trim()) {
+        alert("Por favor pega algún código.");
+        return;
+      }
+
+      var hallazgos = [];
+      var limpio = src;
+
+      /* 1. Nombres de clases bloqueadas por Brave/Opera (guía) */
+      var clasesBloqueo = [
+        { regex: /ad-banner/gi,  nota: ".ad-banner" },
+        { regex: /promo-box/gi,  nota: ".promo-box" },
+        { regex: /social-ads/gi, nota: ".social-ads" },
+        { regex: /analytics/gi,  nota: ".analytics" },
+        { regex: /tracker/gi,    nota: ".tracker" }
+      ];
+
+      clasesBloqueo.forEach(function (item) {
+        if (item.regex.test(src)) {
+          hallazgos.push(
+            '<span class="badge-danger">BLOQUEO GRAVE</span> ' +
+            "Clase sospechosa <code>" + item.nota + "</code> (Brave/Opera la ocultarán)."
+          );
+          limpio = limpio.replace(item.regex, "seccion-destacada");
+        }
+      });
+
+      /* 2. Viewport rígido: 100vh sin min-height (guía) */
+      if (/100vh/gi.test(src) && !/min-height/gi.test(src)) {
+        hallazgos.push(
+          '<span class="badge-danger">DESBORDAMIENTO</span> ' +
+          "Se detectó <code>100vh</code> rígido. Reemplazar por <code>min-height: 100dvh</code>."
+        );
+        limpio = limpio.replace(/height:\s*100vh;/gi, "min-height: 100dvh;");
+      }
+
+      /* 3. Dictamen de viabilidad (guía) */
+      var viabilidad = hallazgos.length <= 2
+        ? '<span class="badge-success">CÓDIGO RESCATABLE</span> Aplica los cambios sugeridos abajo.'
+        : '<span class="badge-danger">REFACTORIZAR</span> Demasiadas inconsistencias, conviene rehacer la maquetación.';
+
+      var html = "<p><b>Dictamen:</b> " + viabilidad + "</p><ul style='padding-left:20px;'>";
+      hallazgos.forEach(function (h) {
+        html += "<li>" + h + "</li>";
+      });
+      if (hallazgos.length === 0) {
+        html += "<li><span class='badge-success'>EXCELENTE</span> " +
+                "No se encontraron nombres de clases bloqueables ni errores de viewport.</li>";
+      }
+      html += "</ul>";
+
+      /* DOMPurify: todo HTML se sanea antes de entrar al DOM.
+         Si el CDN no cargó (sin internet), se usa texto plano. */
+      var reporte = document.getElementById("detallesReporte");
+      if (window.DOMPurify) {
+        reporte.innerHTML = DOMPurify.sanitize(html);
+      } else {
+        reporte.textContent = html.replace(/<[^>]*>/g, "");
+      }
+
+      document.getElementById("codigoSugerido").value = limpio;
+      document.getElementById("panelResultado").style.display = "block";
+    }
+  </script>
+</body>
+</html>

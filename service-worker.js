@@ -3,7 +3,7 @@
    Guarda los archivos base para que la página abra sin internet.
    ========================================================== */
 
-var CACHE = "perfil-pwa-v1";
+var CACHE = "perfil-pwa-v5";
 
 var ARCHIVOS = [
   "./",
@@ -12,17 +12,24 @@ var ARCHIVOS = [
   "./script.js",
   "./manifest.json",
   "./foto-perfil.jpg",
+  "./foto-perfil.webp",
+  "./foto-perfil-400.webp",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/maskable-512.png"
 ];
 
-// 1. Instalación: guarda los archivos en caché
+// 1. Instalación: guarda los archivos en caché (cada archivo por
+// separado: si uno falta, el resto igual queda offline)
 self.addEventListener("install", function (evento) {
   evento.waitUntil(
     caches.open(CACHE)
       .then(function (cache) {
-        return cache.addAll(ARCHIVOS);
+        return Promise.all(ARCHIVOS.map(function (archivo) {
+          return cache.add(archivo).catch(function () {
+            return null; // un archivo ausente no rompe la instalación
+          });
+        }));
       })
       .then(function () {
         return self.skipWaiting();
@@ -46,55 +53,93 @@ self.addEventListener("activate", function (evento) {
   );
 });
 
-// 3. Descargas: internet primero (para ver cambios) y caché si no hay red
+// 3. Descargas: estrategias por tipo de recurso (offline-first)
 self.addEventListener("fetch", function (evento) {
   var peticion = evento.request;
 
   if (peticion.method !== "GET") return;
 
   var url = new URL(peticion.url);
-  if (url.origin !== self.location.origin) return; // Google Sheets e imágenes externas pasan directo
+  var mismaOrigen = url.origin === self.location.origin;
 
-  // Las imágenes e iconos sí se guardan y se sirven desde la caché
+  // Google Sheets (horario): contenido dinámico, nunca se cachea
+  if (url.hostname === "docs.google.com") return;
+
   var esImagen = /\.(png|jpe?g|gif|webp|svg|ico)$/i.test(url.pathname);
+  var esFuente = /\.(woff2?|ttf|eot)$/i.test(url.pathname);
+  var esCssJs = /\.(css|js)$/i.test(url.pathname);
 
-  if (esImagen) {
-    evento.respondWith(
-      caches.match(peticion).then(function (guardado) {
-        if (guardado) return guardado;
-
-        return fetch(peticion).then(function (respuesta) {
-          if (respuesta && respuesta.ok) {
-            var copia = respuesta.clone();
-            caches.open(CACHE).then(function (cache) {
-              cache.put(peticion, copia);
-            });
-          }
-          return respuesta;
-        });
-      })
-    );
+  // Imágenes y fuentes (locales y externas): CACHÉ PRIMERO (offline-first)
+  if (esImagen || esFuente) {
+    evento.respondWith(cachePrimero(peticion));
     return;
   }
 
-  // HTML, CSS y JS: se intenta la red primero y, si falla, la caché
-  evento.respondWith(
-    fetch(peticion)
-      .then(function (respuesta) {
-        if (respuesta && respuesta.ok) {
-          var copia = respuesta.clone();
-          caches.open(CACHE).then(function (cache) {
-            cache.put(peticion, copia);
-          });
+  // CSS y JS de CDNs (Bootstrap, fuentes, iconos): STALE-WHILE-REVALIDATE
+  // → se responde al instante desde caché y se refresca de fondo
+  if (esCssJs) {
+    evento.respondWith(caducadoMientrasRevalida(peticion));
+    return;
+  }
+
+  // Resto del mismo origen (HTML): red primero y caché si no hay red
+  if (mismaOrigen) {
+    evento.respondWith(redPrimero(peticion));
+    return;
+  }
+
+  // Cualquier otro recurso externo pasa directo
+});
+
+function cachePrimero(peticion) {
+  return caches.match(peticion).then(function (guardado) {
+    if (guardado) return guardado;
+
+    return fetch(peticion).then(function (respuesta) {
+      if (respuesta && (respuesta.ok || respuesta.type === "opaque")) {
+        var copia = respuesta.clone();
+        caches.open(CACHE).then(function (cache) {
+          cache.put(peticion, copia);
+        });
+      }
+      return respuesta;
+    });
+  });
+}
+
+function caducadoMientrasRevalida(peticion) {
+  return caches.open(CACHE).then(function (cache) {
+    return caches.match(peticion).then(function (guardado) {
+      var refresco = fetch(peticion).then(function (respuesta) {
+        if (respuesta && (respuesta.ok || respuesta.type === "opaque")) {
+          cache.put(peticion, respuesta.clone());
         }
         return respuesta;
-      })
-      .catch(function () {
-        return caches.match(peticion).then(function (guardado) {
-          if (guardado) return guardado;
-          if (peticion.mode === "navigate") return caches.match("./index.html");
-          return null;
+      }).catch(function () {
+        return guardado;
+      });
+
+      return guardado || refresco;
+    });
+  });
+}
+
+function redPrimero(peticion) {
+  return fetch(peticion)
+    .then(function (respuesta) {
+      if (respuesta && respuesta.ok) {
+        var copia = respuesta.clone();
+        caches.open(CACHE).then(function (cache) {
+          cache.put(peticion, copia);
         });
-      })
-  );
-});
+      }
+      return respuesta;
+    })
+    .catch(function () {
+      return caches.match(peticion).then(function (guardado) {
+        if (guardado) return guardado;
+        if (peticion.mode === "navigate") return caches.match("./index.html");
+        return null;
+      });
+    });
+}

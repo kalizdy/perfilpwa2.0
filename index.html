@@ -12,8 +12,7 @@
   <meta name="description" content="Perfil personal de Deimar Yeri Quispe Ramos: pasatiempos, intereses, horario, música, juegos y contacto.">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Deimar Yeri">
 
   <!-- Detección de móvil/tablet (guía PWA) -->
@@ -24,17 +23,54 @@
     })();
   </script>
 
+  <!-- Redes: adelanta la conexión con los CDN -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
+
+  <!-- Redes sociales / SEO -->
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="Deimar Yeri Quispe Ramos — Mi Perfil">
+  <meta property="og:description" content="Perfil personal: programación, mercados financieros, música y juegos. PWA instalable y offline.">
+  <meta property="og:url" content="https://kalizdy.github.io/perfilpwa2.0/">
+  <meta property="og:image" content="https://kalizdy.github.io/perfilpwa2.0/foto-perfil.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Deimar Yeri Quispe Ramos",
+      "url": "https://kalizdy.github.io/perfilpwa2.0/",
+      "image": "https://kalizdy.github.io/perfilpwa2.0/foto-perfil.jpg",
+      "jobTitle": "Estudiante de Ingeniería de Sistemas",
+      "knowsAbout": ["Programación web", "Mercados financieros", "Criptomonedas", "Música"],
+      "sameAs": [
+        "https://www.facebook.com/deymaryeri.quisperamos/",
+        "https://www.instagram.com/francotech24/",
+        "https://github.com/kalizdy"
+      ]
+    }
+  </script>
+
+  <!-- LCP: la foto del personaje se precarga en WebP (imagen más grande visible) -->
+  <link rel="preload" as="image" type="image/webp"
+        href="foto-perfil.webp"
+        imagesrcset="foto-perfil-400.webp 400w, foto-perfil.webp 750w"
+        imagesizes="(max-width: 768.98px) and (orientation: portrait) 60vw, (orientation: landscape) and (max-height: 520px) 40vw, 340px"
+        fetchpriority="high">
+
   <!-- Tipografías -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..600&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
 
   <!-- Bootstrap 5 (CDN) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Iconos de Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <!-- Mi hoja de estilos -->
-  <link rel="stylesheet" href="style.css?v=lobby15">
+  <link rel="stylesheet" href="style.css?v=lobby38">
 </head>
 <body>
 
@@ -42,7 +78,30 @@
 
   <!-- ================= ESCENARIO DE FONDO ================= -->
   <div class="fondo-escenario" aria-hidden="true">
-    <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1600&q=70" alt="">
+    <!-- Carrusel con los intereses: programación, mercados, cripto y videojuegos -->
+    <div class="fondo-carrusel" id="fondoCarrusel">
+      <img class="activa"
+           src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=65"
+           srcset="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=420&q=60 420w,
+                   https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=65 700w"
+           sizes="100vw"
+           alt="" decoding="async" fetchpriority="low">
+      <img src="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=700&q=65"
+           srcset="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=420&q=60 420w,
+                   https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=700&q=65 700w"
+           sizes="100vw"
+           alt="" loading="lazy" decoding="async" fetchpriority="low">
+      <img src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=700&q=65"
+           srcset="https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=420&q=60 420w,
+                   https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=700&q=65 700w"
+           sizes="100vw"
+           alt="" loading="lazy" decoding="async" fetchpriority="low">
+      <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=700&q=65"
+           srcset="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=420&q=60 420w,
+                   https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=700&q=65 700w"
+           sizes="100vw"
+           alt="" loading="lazy" decoding="async" fetchpriority="low">
+    </div>
     <div class="fondo-tilt"></div>
     <div class="fondo-brillo"></div>
   </div>
@@ -50,7 +109,10 @@
   <!-- ================= BARRA SUPERIOR ================= -->
   <header class="barra-top">
     <div class="jugador">
-      <img src="foto-perfil.jpg" alt="Foto de Deimar Yeri" class="jugador-foto">
+      <picture>
+        <source srcset="foto-perfil-400.webp" type="image/webp">
+        <img src="foto-perfil.jpg" alt="Foto de Deimar Yeri" class="jugador-foto" width="400" height="533" decoding="async">
+      </picture>
       <div class="jugador-datos">
         <strong>Deimar Yeri</strong>
         <small>Mi Perfil Personal</small>
@@ -58,15 +120,20 @@
       <div id="perfilSaludo" class="jugador-saludo"></div>
     </div>
 
-    <div class="top-recursos" aria-hidden="true">
-      <span class="chip-recurso"><i class="bi bi-music-note-beamed"></i>90 canciones</span>
-      <span class="chip-recurso chip-oro"><i class="bi bi-joystick"></i>3 juegos</span>
-    </div>
+    <!-- Barra de carrera con avance visual (sin escribir el semestre) -->
+    <span class="barra-carrera" title="Estudiante de Ingeniería de Sistemas"
+          aria-label="Estudiante de Ingeniería de Sistemas, avance de la carrera">
+      <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
+      <span class="carrera-texto">
+        <span class="carrera-larga">Estudiante de Ingeniería de Sistemas</span>
+        <span class="carrera-corta">Ing. Sistemas</span>
+        <span class="carrera-progreso" aria-hidden="true">
+          <span class="carrera-progreso-relleno"></span>
+        </span>
+      </span>
+    </span>
 
     <div class="top-acciones">
-      <button id="botonHidratar" type="button" class="btn-top btn-hidratar" aria-label="Hidratar la página" title="Hidratar la página (demo)">
-        <i class="bi bi-droplet-half"></i><span class="txt-hidratar">Hidratar<span class="txt-largo"> la página</span></span>
-      </button>
       <button id="botonInstalar" type="button" class="btn-top d-none" aria-label="Instalar la aplicación">
         <i class="bi bi-download"></i>
       </button>
@@ -119,9 +186,15 @@
       </button>
     </nav>
 
-    <!-- Personaje central -->
+    <!-- Personaje central (WebP + respaldo JPG, dimensiones para evitar CLS) -->
     <div class="escenario">
-      <img class="personaje" src="foto-perfil.jpg" alt="Deimar Yeri Quispe Ramos">
+      <picture>
+        <source type="image/webp"
+                srcset="foto-perfil-400.webp 400w, foto-perfil.webp 750w"
+                sizes="(max-width: 768.98px) and (orientation: portrait) 60vw, (orientation: landscape) and (max-height: 520px) 40vw, 340px">
+        <img class="personaje" src="foto-perfil.jpg" alt="Deimar Yeri Quispe Ramos"
+             width="750" height="1000" fetchpriority="high" decoding="async">
+      </picture>
       <div class="placa-nombre">
         <h1>Deimar Yeri Quispe Ramos</h1>
         <p>Tecnología • Mercados financieros • Música</p>
@@ -143,7 +216,7 @@
           <h2 class="panel-titulo"><i class="bi bi-controller"></i>Pasatiempos</h2>
           <div class="tarjetas-mini">
             <article class="mini-card">
-              <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=400&h=400&q=70"
+              <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=400&h=400&q=70"
                    alt="Control de videojuegos con luces neón">
               <div class="mini-datos">
                 <h3>Videojuegos</h3>
@@ -151,7 +224,7 @@
               </div>
             </article>
             <article class="mini-card">
-              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&h=400&q=70"
+              <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&h=400&q=70"
                    alt="Audífonos sobre un fondo amarillo">
               <div class="mini-datos">
                 <h3>Escuchar música</h3>
@@ -166,7 +239,7 @@
           <h2 class="panel-titulo"><i class="bi bi-stars"></i>Intereses</h2>
           <div class="tarjetas-mini">
             <article class="mini-card">
-              <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&h=400&q=70"
+              <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&h=400&q=70"
                    alt="Laptop con código de programación">
               <div class="mini-datos">
                 <h3>Programación</h3>
@@ -174,7 +247,7 @@
               </div>
             </article>
             <article class="mini-card">
-              <img src="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=400&h=400&q=70"
+              <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=400&h=400&q=70"
                    alt="Pantalla con un gráfico de precios de bolsa">
               <div class="mini-datos">
                 <h3>Mercados financieros</h3>
@@ -182,7 +255,7 @@
               </div>
             </article>
             <article class="mini-card">
-              <img src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=400&h=400&q=70"
+              <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=400&h=400&q=70"
                    alt="Celular mostrando el mercado de bitcoin y ethereum">
               <div class="mini-datos">
                 <h3>Criptomonedas</h3>
@@ -253,29 +326,35 @@
           <p id="mensajeFiltroJuegos" class="mensaje-filtro" aria-live="polite"></p>
 
           <div class="juegos-lista">
-            <article class="juego-card" data-tipo="MOBA">
-              <img src="https://cdn.cloudflare.steamstatic.com/steam/apps/570/header.jpg" alt="Dota 2">
+            <a class="juego-card" data-tipo="MOBA" href="https://www.dota2.com/home"
+               target="_blank" rel="noopener" title="Abrir el sitio oficial de Dota 2">
+              <img loading="lazy" decoding="async" src="https://cdn.cloudflare.steamstatic.com/steam/apps/570/header.jpg" alt="Dota 2">
               <div class="juego-datos">
                 <h3>Dota 2</h3>
                 <p>Estrategia y trabajo en equipo.</p>
               </div>
-            </article>
+              <i class="bi bi-box-arrow-up-right juego-externo" aria-hidden="true"></i>
+            </a>
 
-            <article class="juego-card" data-tipo="Battle Royale">
-              <img src="https://static.wikia.nocookie.net/fortnite/images/a/a5/Fortnite_Chapter_7-_Season_4_cover_image.jpg/revision/latest" alt="Fortnite">
+            <a class="juego-card" data-tipo="Battle Royale" href="https://www.fortnite.com/"
+               target="_blank" rel="noopener" title="Abrir el sitio oficial de Fortnite">
+              <img loading="lazy" decoding="async" src="https://static.wikia.nocookie.net/fortnite/images/a/a5/Fortnite_Chapter_7-_Season_4_cover_image.jpg/revision/latest" alt="Fortnite">
               <div class="juego-datos">
                 <h3>Fortnite</h3>
                 <p>Battle royale con construcción y disparos.</p>
               </div>
-            </article>
+              <i class="bi bi-box-arrow-up-right juego-externo" aria-hidden="true"></i>
+            </a>
 
-            <article class="juego-card" data-tipo="MOBA">
-              <img src="https://akmweb.youngjoygame.com/web/gms/image/c3d1596795b86dc26e5f1ef2d48c3dfd.jpg" alt="Mobile Legends">
+            <a class="juego-card" data-tipo="MOBA" href="https://www.mobilelegends.com/"
+               target="_blank" rel="noopener" title="Abrir el sitio oficial de Mobile Legends">
+              <img loading="lazy" decoding="async" src="https://akmweb.youngjoygame.com/web/gms/image/c3d1596795b86dc26e5f1ef2d48c3dfd.jpg" alt="Mobile Legends">
               <div class="juego-datos">
                 <h3>Mobile Legends</h3>
                 <p>MOBA para celular, partidas rápidas.</p>
               </div>
-            </article>
+              <i class="bi bi-box-arrow-up-right juego-externo" aria-hidden="true"></i>
+            </a>
           </div>
         </section>
 
@@ -300,9 +379,25 @@
 
             <div class="row g-2 mb-2">
               <div class="col-6">
-                <label for="conCelular" class="form-label">Celular</label>
-                <input type="tel" class="form-control form-control-sm" id="conCelular" maxlength="17"
-                       placeholder="987 654 321" autocomplete="tel">
+                <div class="d-flex justify-content-between align-items-center">
+                  <label for="conCelular" class="form-label mb-1">Celular</label>
+                  <select id="conPais" class="form-select form-select-sm pais-select" aria-label="País del celular">
+                    <option value="BO" selected>BO +591</option>
+                    <option value="PE">PE +51</option>
+                    <option value="AR">AR +54</option>
+                    <option value="CL">CL +56</option>
+                    <option value="CO">CO +57</option>
+                    <option value="EC">EC +593</option>
+                    <option value="MX">MX +52</option>
+                    <option value="PY">PY +595</option>
+                    <option value="BR">BR +55</option>
+                    <option value="ES">ES +34</option>
+                    <option value="US">US +1</option>
+                    <option value="OTRO">Otro</option>
+                  </select>
+                </div>
+                <input type="tel" class="form-control form-control-sm" id="conCelular" maxlength="8"
+                       inputmode="numeric" placeholder="77597761" autocomplete="tel-national">
                 <div class="invalid-feedback">Falta tu número de celular.</div>
               </div>
 
@@ -349,6 +444,7 @@
           <div id="resumenContacto" class="resumen-contacto d-none">
             <h3 class="subtitulo-contacto">Revisa tu mensaje</h3>
             <p id="resumenTexto" class="resumen-texto"></p>
+            <p id="estadoEnvio" class="estado-envio" role="status" aria-live="polite"></p>
 
             <div class="d-flex flex-wrap gap-2 justify-content-center">
               <a id="enviarWhatsApp" class="btn btn-success btn-sm" target="_blank" rel="noopener">
@@ -372,6 +468,7 @@
     </button>
 
     <div class="abajo-pie">
+      <span id="estadoRed" class="estado-red" role="status" aria-live="polite">🟢 En línea</span>
       <div class="redes">
         <a href="https://www.facebook.com/deymaryeri.quisperamos/" target="_blank" rel="noopener"
            title="Yeri QR" aria-label="Facebook: Yeri QR"><i class="bi bi-facebook"></i></a>
@@ -393,6 +490,6 @@
 </div><!-- /.lobby -->
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="script.js?v=lobby11"></script>
+  <script src="script.js?v=lobby22"></script>
 </body>
 </html>

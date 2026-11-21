@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded", function () {
   prepararFiltroJuegos();
   cerrarMenuAlElegirSeccion();
   cerrarMenuAlHacerClicFuera();
+  prepararFondoCarrusel();
   prepararLobby();
+  prepararEstadoRed();
   registrarServiceWorker();
   prepararInstalacion();
 });
@@ -138,9 +140,39 @@ function resaltarMenuAlHacerScroll() {
    por WhatsApp o por correo.
    ========================================================== */
 
-// 👉 Cambia estos dos datos por los tuyos (así te llegan los mensajes)
-var CORREO_CONTACTO = "";      // Ej. "deimar@correo.com"
-var WHATSAPP_CONTACTO = "";    // Ej. "51987654321" (código de país + número)
+// Datos reales de contacto (los usan los botones del resumen)
+var CORREO_CONTACTO = "yeridey07@gmail.com";
+var WHATSAPP_CONTACTO = "59177597761";  // código de país + número (sin +)
+
+/* ==========================================================
+   VALIDACIÓN DE CELULAR POR PAÍS
+   Cada país define: código telefónico, rango de dígitos y el
+   prefijo con el que debe empezar el número local.
+   ========================================================== */
+var PAISES = {
+  BO:   { nombre: "Bolivia",        codigo: "591", digitos: [8, 8],   inicio: /^[67]/,  ejemplo: "77597761" },
+  PE:   { nombre: "Perú",           codigo: "51",  digitos: [9, 9],   inicio: /^9/,     ejemplo: "987654321" },
+  AR:   { nombre: "Argentina",      codigo: "54",  digitos: [10, 11], inicio: /^\d/,    ejemplo: "1123456789" },
+  CL:   { nombre: "Chile",          codigo: "56",  digitos: [9, 9],   inicio: /^9/,     ejemplo: "987654321" },
+  CO:   { nombre: "Colombia",       codigo: "57",  digitos: [10, 10], inicio: /^3/,     ejemplo: "3001234567" },
+  EC:   { nombre: "Ecuador",        codigo: "593", digitos: [9, 9],   inicio: /^9/,     ejemplo: "987654321" },
+  MX:   { nombre: "México",         codigo: "52",  digitos: [10, 10], inicio: /^\d/,    ejemplo: "5512345678" },
+  PY:   { nombre: "Paraguay",       codigo: "595", digitos: [9, 9],   inicio: /^9/,     ejemplo: "981234567" },
+  BR:   { nombre: "Brasil",         codigo: "55",  digitos: [10, 11], inicio: /^[1-9]/, ejemplo: "11987654321" },
+  ES:   { nombre: "España",         codigo: "34",  digitos: [9, 9],   inicio: /^[6-9]/, ejemplo: "612345678" },
+  US:   { nombre: "EE.UU./Canadá",  codigo: "1",   digitos: [10, 10], inicio: /^[2-9]/, ejemplo: "2025550123" },
+  OTRO: { nombre: "Otro país",      codigo: "",    digitos: [6, 15],  inicio: /^\d/,    ejemplo: "123456789" }
+};
+
+/* ==========================================================
+   SUPABASE (backend real del formulario)
+   La clave "publishable" es pública por diseño: puede vivir en
+   el navegador. La seguridad la da RLS en la base de datos
+   (solo permite INSERTAR, nunca leer ni borrar).
+   ========================================================== */
+var SUPABASE_URL = "https://jeggyjriuqyvyithlvlr.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable_gGVVyNG-zYYDSrs9i3Vo1A_aqUYiIWG";
+var SUPABASE_TABLA = "mensajes_contacto";
 
 // El segundo select cambia según el motivo
 var TEMAS_POR_MOTIVO = {
@@ -175,6 +207,21 @@ function prepararFormularioContacto() {
   limitarCaracteres(nombre, /[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ'.\s-]/g, "Solo letras en el nombre.");
   limitarCaracteres(correo, /[^A-Za-z0-9@._%+-]/g, "Solo letras, números y @ . _ - + en el correo.");
   limitarCaracteres(celular, /[^0-9+\s-]/g, "Solo números en el celular.");
+
+  // Tope de dígitos según el país: al llegar al máximo no deja
+  // seguir escribiendo números.
+  if (celular) {
+    celular.addEventListener("input", function () {
+      var limpio = soloDigitosCelular(celular.value);
+      if (celular.value !== limpio) celular.value = limpio;
+    });
+  }
+
+  var pais = document.getElementById("conPais");
+  if (pais) {
+    pais.addEventListener("change", actualizarPaisCelular);
+    actualizarPaisCelular();
+  }
 
   motivo.addEventListener("change", function () {
     llenarTemasDelMotivo(motivo.value);
@@ -271,16 +318,23 @@ function revisarCorreoContacto() {
 
 function revisarCelularContacto() {
   var campo = document.getElementById("conCelular");
-  var texto = campo.value.trim();
+  var pais = paisDelCelular();
+  var digitos = soloDigitosCelular(campo.value);
 
-  if (texto === "") {
+  if (digitos === "" && campo.value.trim() === "") {
     return marcarCampo(campo, false, "Falta llenar tu número de celular.");
   }
 
-  if (!cumpleMinimo(campo, texto)) return false;
+  var minimo = pais.digitos[0];
+  var maximo = pais.digitos[1];
+  var cuantos = minimo === maximo ? String(minimo) : minimo + " a " + maximo;
+  var mensaje = "Celular de " + cuantos + " dígitos para " + pais.nombre +
+                " (ej. " + pais.ejemplo + ").";
 
-  return marcarCampo(campo, /^9\d{8}$/.test(normalizarCelular(texto)),
-    "Celular de 9 dígitos que empiece en 9 (ej. 987 654 321).");
+  if (digitos.length < minimo) return marcarCampo(campo, false, mensaje);
+  if (!pais.inicio.test(digitos)) return marcarCampo(campo, false, mensaje);
+
+  return marcarCampo(campo, true, "");
 }
 
 function revisarMotivoContacto() {
@@ -391,6 +445,17 @@ function prepararEnvio() {
     mostrarAviso(aviso, "success", "¡Listo! Elige cómo quieres enviarlo.");
   }
 
+  /* OFFLINE-FIRST (guía PWA): la acción se confirma localmente
+     y queda en la cola; si hay red, se envía a Supabase. */
+  guardarEnCola({
+    nombre: nombre,
+    correo: correo,
+    celular: formatearCelular(celular),
+    motivo: motivo,
+    tema: tema,
+    mensaje: mensaje
+  });
+
   if (resumen) resumen.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
@@ -491,21 +556,49 @@ function esNombreCompleto(texto) {
   });
 }
 
-function normalizarCelular(texto) {
-  var limpio = texto.replace(/[^\d+]/g, "");
+/* ---------- Celular según el país elegido ---------- */
+function paisDelCelular() {
+  var select = document.getElementById("conPais");
+  return PAISES[select ? select.value : "BO"] || PAISES.BO;
+}
 
-  if (limpio.indexOf("+51") === 0) {
-    limpio = limpio.slice(3);
-  } else if (limpio.indexOf("51") === 0 && limpio.length > 9) {
-    limpio = limpio.slice(2);
+// Deja solo dígitos, quita el código de país si lo pegaron y
+// corta al máximo permitido (no deja escribir más números).
+function soloDigitosCelular(texto) {
+  var pais = paisDelCelular();
+  var digitos = String(texto || "").replace(/[^\d]/g, "");
+  var maximo = pais.digitos[1];
+
+  if (pais.codigo && digitos.indexOf(pais.codigo) === 0 && digitos.length > maximo) {
+    digitos = digitos.slice(pais.codigo.length);
   }
 
-  return limpio;
+  return digitos.slice(0, maximo);
+}
+
+function normalizarCelular(texto) {
+  return soloDigitosCelular(texto);
 }
 
 function formatearCelular(digitos) {
-  if (!/^\d{9}$/.test(digitos)) return digitos;
-  return digitos.slice(0, 3) + " " + digitos.slice(3, 6) + " " + digitos.slice(6);
+  var pais = paisDelCelular();
+  if (!digitos) return "";
+
+  var grupos = digitos.replace(/(\d{3})(?=\d)/g, "$1 ");
+  return (pais.codigo ? "+" + pais.codigo + " " : "") + grupos;
+}
+
+// Ajusta el campo al país: tope de dígitos, ejemplo y estado limpio
+function actualizarPaisCelular() {
+  var campo = document.getElementById("conCelular");
+  if (!campo) return;
+
+  var pais = paisDelCelular();
+  campo.setAttribute("maxlength", String(pais.digitos[1]));
+  campo.placeholder = pais.ejemplo;
+  campo.value = soloDigitosCelular(campo.value);
+  campo.classList.remove("is-invalid", "is-valid");
+  ocultarFeedback(campo);
 }
 
 function mostrarAviso(aviso, tipo, mensaje) {
@@ -594,7 +687,39 @@ function prepararMusica() {
     volver.addEventListener("click", mostrarGaleria);
   }
 
-  renderizarGaleria();
+  /* === DELEGACIÓN DE EVENTOS (guía: Event Bubbling) ===
+     UN solo escuchador en la galería captura el clic de TODAS las
+     tarjetas de artista "burbujeando" hacia arriba. Aunque el
+     filtro/busque- recrea las tarjetas mil veces, este listener
+     se registra una sola vez → sin consumo extra de RAM. */
+  var galeria = document.getElementById("galeriaArtistas");
+  if (galeria) {
+    galeria.addEventListener("click", function (evento) {
+      if (!(evento.target instanceof Element)) return;
+
+      var tarjeta = evento.target.closest(".artista-card");
+      if (!tarjeta || !tarjeta.dataset.artista) return;
+
+      mostrarArtista(tarjeta.dataset.artista);
+    });
+  }
+
+  /* Carga diferida: la galería se pinta al abrir Música, para no
+     descargar 9 fotos de artistas al cargar la página (ahorro de datos). */
+  var renderizada = false;
+  function asegurarGaleria() {
+    if (renderizada) return;
+    renderizada = true;
+    renderizarGaleria();
+  }
+
+  document.querySelectorAll('[data-panel="musica"]').forEach(function (boton) {
+    boton.addEventListener("click", asegurarGaleria);
+  });
+
+  document.addEventListener("seccionAbierta", function (evento) {
+    if (evento.detail === "musica") asegurarGaleria();
+  });
 }
 
 // Agrupa el catálogo por artista (con su género, foto y total)
@@ -683,6 +808,8 @@ function crearTarjetaArtista(artista) {
   imagen.className = "artista-foto";
   imagen.src = artista.portada;
   imagen.alt = "Foto de " + artista.nombre;
+  imagen.loading = "lazy";
+  imagen.decoding = "async";
   imagen.addEventListener("error", function () {
     imagen.src = PORTADA_GENERICA;
   }, { once: true });
@@ -695,13 +822,13 @@ function crearTarjetaArtista(artista) {
   cantidad.className = "artista-cantidad";
   cantidad.textContent = artista.total + " canciones";
 
+  // Delegación (guía Event Bubbling): la tarjeta NO lleva listener
+  // propio; solo marca quién es. El clic lo captura el contenedor.
+  boton.dataset.artista = artista.nombre;
+
   boton.appendChild(imagen);
   boton.appendChild(nombre);
   boton.appendChild(cantidad);
-
-  boton.addEventListener("click", function () {
-    mostrarArtista(artista.nombre);
-  });
 
   return boton;
 }
@@ -942,6 +1069,16 @@ var CANCIONES = [
   { titulo: "Quiero Saber", artista: "Los Karkas", genero: "Cumbia", portada: "" }
 ];
 
+/* Enlace de YouTube para una canción:
+   si el catálogo trae un video propio se usa; si no, se abre la
+   búsqueda exacta "artista + título" (siempre encuentra la canción). */
+function enlaceYoutube(cancion) {
+  if (cancion.youtube) return cancion.youtube;
+
+  var consulta = encodeURIComponent(cancion.artista + " " + cancion.titulo);
+  return "https://www.youtube.com/results?search_query=" + consulta;
+}
+
 function pintarCanciones(canciones) {
   var lista = document.getElementById("listaCanciones");
   if (!lista) return;
@@ -952,10 +1089,19 @@ function pintarCanciones(canciones) {
     var item = document.createElement("li");
     item.className = "list-group-item";
 
+    var enlace = document.createElement("a");
+    enlace.className = "cancion-enlace";
+    enlace.href = enlaceYoutube(cancion);
+    enlace.target = "_blank";
+    enlace.rel = "noopener";
+    enlace.title = "Abrir en YouTube: " + cancion.titulo + " — " + cancion.artista;
+
     var imagen = document.createElement("img");
     imagen.className = "portada";
     imagen.src = cancion.portada || PORTADA_GENERICA;
     imagen.alt = "Portada de " + cancion.titulo + ", " + cancion.artista;
+    imagen.loading = "lazy";
+    imagen.decoding = "async";
 
     var texto = document.createElement("span");
     texto.className = "cancion-texto";
@@ -970,8 +1116,15 @@ function pintarCanciones(canciones) {
     texto.appendChild(titulo);
     texto.appendChild(document.createTextNode(" — " + cancion.artista));
 
-    item.appendChild(imagen);
-    item.appendChild(texto);
+    var iconoYoutube = document.createElement("i");
+    iconoYoutube.className = "bi bi-youtube cancion-youtube";
+    iconoYoutube.setAttribute("aria-hidden", "true");
+
+    enlace.appendChild(imagen);
+    enlace.appendChild(texto);
+    enlace.appendChild(iconoYoutube);
+
+    item.appendChild(enlace);
     lista.appendChild(item);
   });
 
@@ -1023,6 +1176,251 @@ function prepararInstalacion() {
 }
 
 /* ==========================================================
+   FONDO CARRUSEL (intereses)
+   Cambia la imagen de fondo cada 6 s con un fundido suave.
+   Se pausa con la pestaña oculta y respeta "reducir movimiento".
+   ========================================================== */
+var temporizadorFondo = null;
+var fondoListo = false;
+
+function prepararFondoCarrusel() {
+  var contenedor = document.getElementById("fondoCarrusel");
+  if (!contenedor || fondoListo) return;
+
+  var imagenes = contenedor.querySelectorAll("img");
+  if (imagenes.length < 2) return;
+
+  fondoListo = true;
+  var indice = 0;
+
+  function mostrar(nuevo) {
+    imagenes.forEach(function (imagen, i) {
+      imagen.classList.toggle("activa", i === nuevo);
+    });
+    indice = nuevo;
+  }
+
+  // Accesibilidad: si el sistema pide menos movimiento, se queda fija
+  var reducir = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reducir) return;
+
+  function arrancar() {
+    clearInterval(temporizadorFondo); // sin temporizadores duplicados
+    temporizadorFondo = setInterval(function () {
+      mostrar((indice + 1) % imagenes.length);
+    }, 6000);
+  }
+
+  arrancar();
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      clearInterval(temporizadorFondo);
+    } else {
+      arrancar();
+    }
+  });
+
+  window.addEventListener("pagehide", function () {
+    clearInterval(temporizadorFondo);
+  });
+}
+
+/* ==========================================================
+   OFFLINE-FIRST + SUPABASE (backend real)
+   La acción del usuario se confirma localmente; si hay red se
+   envía a Supabase y, si no, queda en cola y se reintenta al
+   recuperar la conexión. La seguridad la garantiza RLS: la
+   clave pública solo puede INSERTAR en la tabla.
+   ========================================================== */
+
+var CLAVE_COLA = "colaEnviosPerfil";
+
+function leerCola() {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE_COLA)) || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function escribirCola(cola) {
+  try {
+    localStorage.setItem(CLAVE_COLA, JSON.stringify(cola));
+  } catch (error) {
+    /* si el almacenamiento está bloqueado, la app sigue normal */
+  }
+}
+
+// Toast flotante reutilizable (hidratación, red, sincronización…)
+// Sin innerHTML: los nodos se crean con DOM seguro (anti-XSS).
+function mostrarToast(texto, icono) {
+  var aviso = document.getElementById("avisoHidratacion");
+  if (!aviso) return;
+
+  clearTimeout(mostrarToast.temporizador); // sin timers huérfanos
+
+  aviso.textContent = "";
+
+  var iconoElemento = document.createElement("i");
+  iconoElemento.className = "bi " + (icono || "bi-info-circle");
+
+  aviso.appendChild(iconoElemento);
+  aviso.appendChild(document.createTextNode(" " + texto));
+  aviso.classList.remove("d-none");
+
+  mostrarToast.temporizador = setTimeout(function () {
+    aviso.classList.add("d-none");
+  }, 3000);
+}
+
+/* ---------- Envío real a Supabase (REST) ---------- */
+async function enviarASupabase(datos) {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return false;
+
+  try {
+    var respuesta = await fetch(SUPABASE_URL + "/rest/v1/" + SUPABASE_TABLA, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        nombre: datos.nombre,
+        correo: datos.correo,
+        celular: datos.celular,
+        motivo: datos.motivo,
+        tema: datos.tema,
+        mensaje: datos.mensaje
+      })
+    });
+
+    return respuesta.ok;
+  } catch (error) {
+    return false; // sin internet o Supabase no responde
+  }
+}
+
+/* ---------- Detector visual online/offline (guía) ---------- */
+function refrescarEstadoRed() {
+  var chip = document.getElementById("estadoRed");
+  if (!chip) return;
+
+  var cola = leerCola();
+  var pendientes = cola.filter(function (item) {
+    return item.estado === "pendiente";
+  }).length;
+
+  if (navigator.onLine) {
+    chip.textContent = "🟢 En línea" + (pendientes ? " — " + pendientes + " pendiente(s)" : "");
+    chip.classList.add("estado-online");
+    chip.classList.remove("estado-offline");
+  } else {
+    chip.textContent = "🟠 Offline — datos locales" + (pendientes ? " (" + pendientes + ")" : "");
+    chip.classList.add("estado-offline");
+    chip.classList.remove("estado-online");
+  }
+}
+
+/* ---------- Cola: guardar, reintentar y sincronizar ---------- */
+function guardarEnCola(datos) {
+  var cola = leerCola();
+  cola.push({
+    fecha: new Date().toLocaleString("es-BO"),
+    estado: "pendiente",
+    datos: datos
+  });
+  escribirCola(cola);
+
+  refrescarEstadoRed();
+  actualizarEstadoEnvio();
+
+  if (!navigator.onLine) {
+    mostrarToast("🟠 Guardado localmente — pendiente de envío", "bi-cloud-arrow-down");
+    return;
+  }
+
+  sincronizarCola();
+}
+
+var sincronizando = false;
+
+async function sincronizarCola() {
+  if (sincronizando) return;
+  sincronizando = true;
+
+  var cola = leerCola();
+  var huboCambio = false;
+  var huboFallo = false;
+
+  for (var i = 0; i < cola.length; i++) {
+    if (cola[i].estado !== "pendiente") continue;
+
+    var enviado = await enviarASupabase(cola[i].datos);
+
+    if (enviado) {
+      cola[i].estado = "sincronizado";
+      huboCambio = true;
+    } else {
+      huboFallo = true;
+    }
+  }
+
+  if (huboCambio) {
+    escribirCola(cola);
+    mostrarToast("✓ Enviado — mensaje guardado en la nube", "bi-cloud-check");
+  } else if (huboFallo && navigator.onLine) {
+    mostrarToast("⚠ No se pudo enviar — se reintentará al reconectar", "bi-cloud-slash");
+  }
+
+  sincronizando = false;
+
+  refrescarEstadoRed();
+  actualizarEstadoEnvio();
+}
+
+/* ---------- Estado de envío en el resumen (UI optimista) ---------- */
+function actualizarEstadoEnvio() {
+  var estado = document.getElementById("estadoEnvio");
+  if (!estado) return;
+  if (document.getElementById("resumenContacto").classList.contains("d-none")) return;
+
+  var pendientes = leerCola().filter(function (item) {
+    return item.estado === "pendiente";
+  }).length;
+
+  if (!navigator.onLine) {
+    estado.textContent = "🟠 Guardado localmente — pendiente de envío";
+    estado.classList.add("estado-pendiente");
+    estado.classList.remove("estado-listo");
+  } else if (pendientes) {
+    estado.textContent = "🟠 " + pendientes + " mensaje(s) pendiente(s) de envío";
+    estado.classList.add("estado-pendiente");
+    estado.classList.remove("estado-listo");
+  } else {
+    estado.textContent = "🟢 Enviado — guardado en el servidor ✓";
+    estado.classList.add("estado-listo");
+    estado.classList.remove("estado-pendiente");
+  }
+}
+
+function prepararEstadoRed() {
+  refrescarEstadoRed();
+
+  window.addEventListener("online", function () {
+    sincronizarCola();
+  });
+
+  window.addEventListener("offline", refrescarEstadoRed);
+
+  // Si había mensajes pendientes de una visita anterior, reintentar
+  if (navigator.onLine) sincronizarCola();
+}
+
+/* ==========================================================
    LOBBY: RAIL, PESTAÑAS Y PANEL FLOTANTE
    Cada sección se abre en una tarjeta que flota al costado;
    la pantalla principal nunca se cubre.
@@ -1034,22 +1432,18 @@ function prepararLobby() {
 
   var seccionActiva = null;   // nombre de la sección mostrada
   var eventosConectados = false;
-  var demoEnMarcha = false;
 
   /* === HIDRATACIÓN (guía: arquitectura frontend avanzada) ===
      La página carga primero con la interfaz estática (rápida),
      y JS "hidrata" conectando los eventos sin redibujar nada.
      El guard equivale al .off() antes del .on() de jQuery:
      conecta los escuchadores UNA sola vez en toda la vida de la
-     página (aunque se pulse el botón "Hidratar la página" mil
-     veces) → sin fugas de memoria. */
+     página → sin fugas de memoria. Es un proceso interno: no hay
+     botón ni aviso en pantalla. */
 
   function conectarEventos() {
     if (eventosConectados) return; // guard anti fuga: ya están conectados
     eventosConectados = true;
-
-    // Escuchadores del panel (se registran una sola vez)
-    var botones = document.querySelectorAll("[data-panel]");
 
     function abrirSeccion(nombre) {
       var destino = document.getElementById(nombre);
@@ -1072,6 +1466,9 @@ function prepararLobby() {
       // Al reabrir la sección, su contenido se ve desde arriba.
       var scrollPanel = panel.querySelector(".panel-scroll");
       if (scrollPanel) scrollPanel.scrollTop = 0;
+
+      // Aviso interno para cargas diferidas (p. ej. galería de música)
+      document.dispatchEvent(new CustomEvent("seccionAbierta", { detail: nombre }));
     }
 
     function cerrarPanel() {
@@ -1082,22 +1479,29 @@ function prepararLobby() {
       });
     }
 
-    botones.forEach(function (boton) {
-      if (boton.id === "cerrarPanel" || boton === document.body) return;
-      boton.addEventListener("click", function (evento) {
-        evento.preventDefault();
+    /* === DELEGACIÓN DE EVENTOS (guía: Event Bubbling) ===
+       En lugar de 1 listener por botón (rail + CTA + menú), UN solo
+       escuchador en document recibe el clic "burbujeado" y pregunta
+       con closest() quién lo originó. Menos RAM y funciona con
+       botones que existan en el futuro. */
+    document.addEventListener("click", function (evento) {
+      if (!(evento.target instanceof Element)) return;
 
-        var nombre = evento.currentTarget.dataset.panel;
-        if (!nombre) return;
+      var boton = evento.target.closest("[data-panel]");
+      if (!boton || boton.id === "cerrarPanel") return;
 
-        var yaAbierto = seccionActiva === nombre && panel.classList.contains("abierto");
-        if (yaAbierto) {
-          cerrarPanel();
-          return;
-        }
+      evento.preventDefault(); // evita el salto de los href del menú
 
-        abrirSeccion(nombre);
-      });
+      var nombre = boton.dataset.panel;
+      if (!nombre) return;
+
+      var yaAbierto = seccionActiva === nombre && panel.classList.contains("abierto");
+      if (yaAbierto) {
+        cerrarPanel();
+        return;
+      }
+
+      abrirSeccion(nombre);
     });
 
     // Botón X del panel
@@ -1117,8 +1521,6 @@ function prepararLobby() {
 
       cerrarPanel();
     });
-
-    panel.abrirSeccion = abrirSeccion; // (uso interno de la demo)
   }
 
   function activarInterfaz() {
@@ -1129,28 +1531,6 @@ function prepararLobby() {
       elemento.classList.remove("no-hidratado");
       elemento.removeAttribute("aria-disabled");
     });
-
-    mostrarAvisoHidratacion();
-  }
-
-  // Pone la interfaz en modo "estática" (para la demo visual)
-  function ponerEstatica() {
-    panel.dataset.hidratado = "false";
-    document.querySelectorAll(".rail-btn, .abajo-cta, .menu-lista").forEach(function (elemento) {
-      elemento.classList.add("no-hidratado");
-      elemento.setAttribute("aria-disabled", "true");
-    });
-  }
-
-  function mostrarAvisoHidratacion() {
-    var aviso = document.getElementById("avisoHidratacion");
-    if (!aviso) return;
-
-    clearTimeout(mostrarAvisoHidratacion.temporizador); // sin timers huérfanos
-    aviso.classList.remove("d-none");
-    mostrarAvisoHidratacion.temporizador = setTimeout(function () {
-      aviso.classList.add("d-none");
-    }, 2600);
   }
 
   // Carga normal: estática → hidratada a los 400 ms (como la guía)
@@ -1158,25 +1538,4 @@ function prepararLobby() {
     conectarEventos(); // guard: solo la primera vez
     activarInterfaz();
   }, 400);
-
-  /* === BOTÓN DEMO "Hidratar la página" ===
-     Vuelve a mostrar el proceso completo delante del usuario:
-     interfaz estática → (600 ms) → hidratada. Los escuchadores
-     NO se duplican gracias al guard de conectarEventos(). */
-  var botonHidratar = document.getElementById("botonHidratar");
-  if (botonHidratar) {
-    botonHidratar.addEventListener("click", function () {
-      if (demoEnMarcha) return;
-      demoEnMarcha = true;
-
-      panel.classList.remove("abierto");
-      ponerEstatica();
-
-      setTimeout(function () {
-        conectarEventos(); // el guard evita duplicar escuchadores
-        activarInterfaz();
-        demoEnMarcha = false;
-      }, 600);
-    });
-  }
 }

@@ -24,6 +24,15 @@
   --borde: rgba(148, 197, 255, 0.14);
 }
 
+/* Fondo base por tema (evita destellos al cargar) */
+body {
+  background: #ffffff;
+}
+
+body[data-bs-theme="dark"] {
+  background: #050a14;
+}
+
 /* ===== Base ===== */
 * {
   box-sizing: border-box;
@@ -69,11 +78,40 @@ h1, h2, h3,
   z-index: -3;
 }
 
-.fondo-escenario img {
+/* Carrusel de intereses (programación, mercados, cripto, juegos) */
+.fondo-carrusel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.fondo-carrusel img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(1.15) brightness(0.85);
+  opacity: 0;
+  filter: saturate(1.1) brightness(0.85);
+  transition: opacity 1.2s ease;
+}
+
+.fondo-carrusel img.activa {
+  opacity: 0.92;
+}
+
+/* Si el sistema pide menos movimiento, sin fundidos */
+@media (prefers-reduced-motion: reduce) {
+  .fondo-carrusel img {
+    transition: none;
+  }
+}
+
+/* Tema claro: vidriera más luminosa para que se vean los intereses */
+body:not([data-bs-theme="dark"]) .fondo-tilt {
+  background:
+    linear-gradient(180deg, rgba(6, 12, 26, 0.45) 0%, rgba(10, 18, 40, 0.18) 35%, rgba(4, 9, 20, 0.6) 100%),
+    linear-gradient(110deg, rgba(37, 99, 235, 0.28) 0%, transparent 45%, rgba(6, 182, 212, 0.24) 100%);
 }
 
 .fondo-tilt {
@@ -165,29 +203,93 @@ h1, h2, h3,
   border: 1px solid rgba(125, 211, 252, 0.35);
 }
 
-.top-recursos {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.chip-recurso {
+/* Barra de carrera con avance visual (sin escribir el semestre) */
+.barra-carrera {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #e9f4ff;
-  background: rgba(2, 8, 20, 0.55);
-  border: 1px solid rgba(125, 211, 252, 0.3);
+  border-radius: 14px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #bae6fd;
+  background: rgba(37, 99, 235, 0.3);
+  border: 1px solid rgba(125, 211, 252, 0.35);
 }
 
-.chip-recurso.chip-oro {
-  color: #fde9a9;
-  border-color: rgba(243, 217, 139, 0.4);
+.barra-carrera i {
+  color: #67e8f9;
+  font-size: 0.85rem;
+}
+
+.carrera-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.carrera-larga,
+.carrera-corta {
+  line-height: 1.15;
+}
+
+/* Relleno de la barra: solo visual, sin números ni texto */
+.carrera-progreso {
+  display: block;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 197, 255, 0.25);
+  overflow: hidden;
+}
+
+.carrera-progreso-relleno {
+  display: block;
+  height: 100%;
+  width: 70%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #67e8f9, #2563eb);
+}
+
+.carrera-corta {
+  display: none;
+}
+
+@media (max-width: 768.98px) and (orientation: portrait) {
+  .carrera-larga {
+    display: none;
+  }
+
+  .carrera-corta {
+    display: inline;
+  }
+
+  .barra-carrera {
+    padding: 4px 6px;
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-width: 379.98px) {
+  .carrera-corta {
+    display: none;
+  }
+
+  .barra-carrera {
+    flex-direction: column;
+    gap: 3px;
+    padding: 5px 7px;
+  }
+
+  .barra-carrera i {
+    font-size: 0.8rem;
+  }
+
+  .carrera-progreso {
+    width: 44px;
+  }
 }
 
 .top-acciones {
@@ -335,6 +437,13 @@ h1, h2, h3,
   pointer-events: none;
 }
 
+/* <picture> es solo un envoltorio: el <img> debe seguir siendo hijo
+   directo del flex para conservar el layout (display: contents) */
+.escenario picture,
+.jugador picture {
+  display: contents;
+}
+
 .personaje {
   height: min(56vh, 480px);
   width: auto;
@@ -390,6 +499,8 @@ h1, h2, h3,
   display: flex;
   flex-direction: column;
   border-radius: 20px;
+  /* El texto del panel sigue el tema (claro/oscuro), no el lobby */
+  color: var(--tinta);
   background: rgba(234, 242, 254, 0.9);
   border: 1px solid var(--cristal-borde);
   box-shadow: var(--sombra-suave);
@@ -655,14 +766,46 @@ h1, h2, h3,
 }
 
 .lista-musica .list-group-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 10px;
-  font-size: 0.82rem;
+  padding: 0;
   color: var(--tinta);
   background: transparent;
   border-color: var(--borde);
+}
+
+/* Cada canción es un enlace real a YouTube (toda la fila es clickeable) */
+.lista-musica .cancion-enlace {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+  color: var(--tinta);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.lista-musica .cancion-enlace:hover,
+.lista-musica .cancion-enlace:focus-visible {
+  background: rgba(37, 99, 235, 0.14);
+  color: var(--tinta);
+  transform: translateX(2px);
+}
+
+.lista-musica .cancion-enlace:focus-visible {
+  outline: 2px solid var(--marca-2);
+  outline-offset: 1px;
+}
+
+.lista-musica .cancion-enlace .cancion-texto {
+  flex: 1 1 auto;
+}
+
+.lista-musica .cancion-enlace .cancion-youtube {
+  flex: 0 0 auto;
+  color: #ff0033;
+  font-size: 1.05rem;
 }
 
 .lista-musica .portada {
@@ -681,6 +824,7 @@ h1, h2, h3,
 }
 
 .juego-card {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -688,8 +832,29 @@ h1, h2, h3,
   border: 1px solid var(--borde);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.65);
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
   transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.juego-card:focus-visible {
+  outline: 2px solid var(--marca-2);
+  outline-offset: 2px;
+}
+
+/* Icono que indica que la tarjeta abre un sitio externo */
+.juego-externo {
+  position: absolute;
+  top: 7px;
+  right: 9px;
+  font-size: 0.7rem;
+  color: var(--marca);
+  opacity: 0.75;
+}
+
+[data-bs-theme="dark"] .juego-externo {
+  color: #67e8f9;
 }
 
 [data-bs-theme="dark"] .juego-card {
@@ -729,6 +894,15 @@ h1, h2, h3,
   font-size: 0.74rem;
   font-weight: 600;
   color: var(--tinta);
+}
+
+/* Selector de país del celular (compacto, junto a la etiqueta) */
+.pais-select {
+  width: auto;
+  max-width: 92px;
+  padding: 2px 20px 2px 6px;
+  font-size: 0.66rem;
+  border-radius: 8px;
 }
 
 .form-control,
@@ -896,10 +1070,6 @@ h1, h2, h3,
     display: none;
   }
 
-  .top-recursos {
-    display: none;
-  }
-
   .centro {
     overflow: hidden;
   }
@@ -1030,54 +1200,63 @@ textarea.form-control:focus {
 }
 
 /* ==========================================================
-   BOTÓN DEMO "HIDRATAR LA PÁGINA" + AVISO FLOTANTE
-   (dos clases: gana al .btn-top que fuerza width 38px)
+   OFFLINE-FIRST: CHIP DE RED + ESTADO DE ENVÍO (guía PWA)
    ========================================================== */
-.btn-top.btn-hidratar {
-  width: auto;                 /* el texto necesita ancho libre */
-  min-width: 38px;
-  height: 38px;
+.estado-red {
   display: inline-flex;
   align-items: center;
-  gap: 0.32rem;
-  padding: 0 0.72rem 0 0.58rem;
-  font-size: clamp(0.62rem, 1.3vw, 0.78rem);
+  gap: 0.3rem;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: #e9f4ff;
   white-space: nowrap;
 }
 
-.btn-hidratar i {
-  color: var(--marca-2);
-  font-size: 1rem;
+.estado-red.estado-online {
+  background: rgba(25, 135, 84, 0.18);
+  color: #75dfa9;
+  border: 1px solid rgba(25, 135, 84, 0.45);
 }
 
-.btn-hidratar:hover {
-  border-color: var(--marca-2);
-  color: #ffffff;
+.estado-red.estado-offline {
+  background: rgba(253, 186, 116, 0.16);
+  color: #fdba74;
+  border: 1px solid rgba(251, 146, 60, 0.45);
 }
+
+.estado-envio {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin: 0.4rem 0 0;
+}
+
+.estado-envio.estado-listo {
+  color: #166534;
+}
+
+.estado-envio.estado-pendiente {
+  color: #92400e;
+}
+
+/* En modo noche, tonos brillantes para el fondo oscuro */
+[data-bs-theme="dark"] .estado-envio.estado-listo {
+  color: #75dfa9;
+}
+
+[data-bs-theme="dark"] .estado-envio.estado-pendiente {
+  color: #fdba74;
+}
+
+/* ==========================================================
+   AVISO FLOTANTE (hidratación interna, red y sincronización)
+   ========================================================== */
 
 /* Vertical de celular: versión compacta (queda DESPUÉS del base
    para que gane y la barra superior no se desborde en 360–430px) */
 @media (max-width: 768.98px) and (orientation: portrait) {
   .barra-top {
     gap: 8px;
-  }
-
-  /* El texto completo no cabe: en vertical basta "Hidratar" */
-  .btn-hidratar .txt-largo {
-    display: none;
-  }
-
-  .btn-top.btn-hidratar {
-    height: 32px;
-    padding: 0 0.42rem 0 0.36rem;
-    gap: 0.2rem;
-    font-size: 0.6rem;
-  }
-
-  .btn-hidratar i {
-    font-size: 0.88rem;
   }
 
   /* Fila del jugador más angosta para dar sitio a los botones */
@@ -1151,11 +1330,6 @@ textarea.form-control:focus {
   .jugador-saludo .saludo-dinamico {
     font-size: 0.6rem;
     padding: 3px 8px;
-  }
-
-  .chip-recurso {
-    padding: 3px 10px;
-    font-size: 0.66rem;
   }
 
   .btn-top {
@@ -1286,12 +1460,44 @@ textarea.form-control:focus {
    ========================================================== */
 @media (orientation: landscape) and (max-height: 520px) {
 
-  /* Panel más grande: ocupa casi toda la pantalla útil */
+  /* Panel compacto a la derecha, sin tapar al personaje */
   .panel-flotante {
-    width: min(600px, calc(100% - 116px));
+    width: min(52vw, 370px);
     top: 4px;
     bottom: 4px;
     right: 4px;
+  }
+
+  /* Al abrir el panel, el escenario se corre a la izquierda:
+     mismo esquema que en la computadora (personaje + panel al costado) */
+  .centro:has(.panel-flotante.abierto) .escenario {
+    left: calc(50% - 20vw);
+    transition: left 0.35s cubic-bezier(0.2, 0.8, 0.25, 1);
+  }
+
+  .centro:has(.panel-flotante.abierto) .personaje {
+    height: min(42vh, 300px);
+  }
+
+  /* La placa se angosta para no chocar con el rail ni con el panel */
+  .centro:has(.panel-flotante.abierto) .placa-nombre {
+    max-width: 190px;
+    padding: 4px 10px;
+    border-radius: 10px;
+  }
+
+  .centro:has(.panel-flotante.abierto) .placa-nombre h1 {
+    font-size: 0.68rem;
+    line-height: 1.15;
+  }
+
+  .centro:has(.panel-flotante.abierto) .placa-nombre p {
+    font-size: 0.48rem;
+    letter-spacing: 0.08em;
+  }
+
+  .escenario {
+    transition: left 0.35s cubic-bezier(0.2, 0.8, 0.25, 1);
   }
 
   .panel-cab .btn-top {
@@ -1401,6 +1607,10 @@ textarea.form-control:focus {
   }
 
   .lista-musica .list-group-item {
+    padding: 0;
+  }
+
+  .lista-musica .cancion-enlace {
     padding: 4px 8px;
     font-size: 0.76rem;
   }
@@ -1498,4 +1708,160 @@ textarea.form-control:focus {
     letter-spacing: 0.02em;
     line-height: 1.1;
   }
+}
+
+/* ==========================================================
+   TEMA DÍA (BLANCO)
+   El modo claro usa fondo blanco con el collage de intereses
+   muy tenue, barras de vidrio blanco y texto oscuro.
+   El modo noche conserva el diseño oscuro original.
+   ========================================================== */
+body:not([data-bs-theme="dark"]) {
+  --cristal: rgba(255, 255, 255, 0.85);
+  --cristal-borde: rgba(15, 23, 42, 0.1);
+  --sombra-suave: 0 10px 26px rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+}
+
+body:not([data-bs-theme="dark"]) .lobby {
+  color: var(--tinta);
+}
+
+/* Fondo: blanco luminoso con los intereses bien visibles */
+body:not([data-bs-theme="dark"]) .fondo-carrusel img {
+  filter: saturate(1) brightness(1) blur(0);
+}
+
+body:not([data-bs-theme="dark"]) .fondo-carrusel img.activa {
+  opacity: 0.8;
+}
+
+body:not([data-bs-theme="dark"]) .fondo-tilt {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.28) 40%, rgba(255, 255, 255, 0.66) 100%),
+    linear-gradient(110deg, rgba(37, 99, 235, 0.1) 0%, transparent 50%, rgba(6, 182, 212, 0.1) 100%);
+}
+
+body:not([data-bs-theme="dark"]) .fondo-brillo {
+  opacity: 0.3;
+}
+
+/* Barra superior */
+body:not([data-bs-theme="dark"]) .jugador-datos strong {
+  color: #0f172a;
+}
+
+body:not([data-bs-theme="dark"]) .jugador-datos small {
+  color: #64748b;
+}
+
+body:not([data-bs-theme="dark"]) .jugador-saludo .saludo-dinamico {
+  color: #1e40af;
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+body:not([data-bs-theme="dark"]) .btn-top {
+  color: #0f172a;
+  background: rgba(15, 23, 42, 0.05);
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+body:not([data-bs-theme="dark"]) .btn-top:hover {
+  background: rgba(37, 99, 235, 0.14);
+  border-color: rgba(37, 99, 235, 0.35);
+  color: #0f172a;
+}
+
+/* Rail de secciones */
+body:not([data-bs-theme="dark"]) .rail-btn {
+  color: #475569;
+}
+
+body:not([data-bs-theme="dark"]) .rail-btn:hover {
+  color: #0f172a;
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+body:not([data-bs-theme="dark"]) .rail-btn.activo {
+  color: #ffffff;
+}
+
+/* Personaje y placa */
+body:not([data-bs-theme="dark"]) .personaje {
+  border-color: rgba(37, 99, 235, 0.25);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.18);
+}
+
+body:not([data-bs-theme="dark"]) .placa-nombre {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+body:not([data-bs-theme="dark"]) .placa-nombre p {
+  color: #64748b;
+}
+
+/* Panel flotante más blanco */
+body:not([data-bs-theme="dark"]) .panel-flotante {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+body:not([data-bs-theme="dark"]) .mini-card {
+  background: #f8fafc;
+}
+
+/* Barra inferior */
+body:not([data-bs-theme="dark"]) .redes a {
+  color: #334155;
+  background: rgba(15, 23, 42, 0.05);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+body:not([data-bs-theme="dark"]) .redes a:hover {
+  color: #ffffff;
+}
+
+body:not([data-bs-theme="dark"]) .abajo-pie .small {
+  color: #64748b;
+}
+
+body:not([data-bs-theme="dark"]) .frase-flotante {
+  color: #334155;
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+body:not([data-bs-theme="dark"]) .frase-flotante i {
+  color: var(--marca-2);
+}
+
+/* Chip de estado de red sobre fondo blanco */
+body:not([data-bs-theme="dark"]) .estado-red.estado-online {
+  background: rgba(22, 101, 52, 0.1);
+  color: #166534;
+  border-color: rgba(22, 101, 52, 0.3);
+}
+
+body:not([data-bs-theme="dark"]) .estado-red.estado-offline {
+  background: rgba(146, 64, 14, 0.1);
+  color: #92400e;
+  border-color: rgba(146, 64, 14, 0.3);
+}
+
+@media (max-width: 339.98px) {
+  .barra-carrera {
+    display: none;
+  }
+}
+
+/* Barra de carrera en modo día */
+body:not([data-bs-theme="dark"]) .barra-carrera {
+  color: #1e40af;
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+body:not([data-bs-theme="dark"]) .barra-carrera i {
+  color: var(--marca);
 }
