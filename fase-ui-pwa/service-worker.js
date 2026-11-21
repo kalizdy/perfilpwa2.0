@@ -3,7 +3,7 @@
    Guarda los archivos base para que la página abra sin internet.
    ========================================================== */
 
-var CACHE = "perfil-pwa-v5";
+var CACHE = "perfil-pwa-v6";
 
 var ARCHIVOS = [
   "./",
@@ -19,17 +19,32 @@ var ARCHIVOS = [
   "./icons/maskable-512.png"
 ];
 
+// Recursos externos esenciales (si fallan, la instalación sigue igual)
+var EXTERNOS = [
+  "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css",
+  "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js",
+  "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+];
+
 // 1. Instalación: guarda los archivos en caché (cada archivo por
 // separado: si uno falta, el resto igual queda offline)
 self.addEventListener("install", function (evento) {
   evento.waitUntil(
     caches.open(CACHE)
       .then(function (cache) {
-        return Promise.all(ARCHIVOS.map(function (archivo) {
+        var locales = ARCHIVOS.map(function (archivo) {
           return cache.add(archivo).catch(function () {
             return null; // un archivo ausente no rompe la instalación
           });
-        }));
+        });
+
+        var externos = EXTERNOS.map(function (url) {
+          return cache.add(url).catch(function () {
+            return null; // sin conexión o CDN caído: se ignora
+          });
+        });
+
+        return Promise.all(locales.concat(externos));
       })
       .then(function () {
         return self.skipWaiting();
@@ -132,14 +147,30 @@ function redPrimero(peticion) {
         caches.open(CACHE).then(function (cache) {
           cache.put(peticion, copia);
         });
+        return respuesta;
       }
-      return respuesta;
+
+      // El servidor respondió un error (5xx): se usa la copia local
+      return buscarEnCache(peticion).then(function (guardado) {
+        return guardado || respuesta;
+      });
     })
     .catch(function () {
-      return caches.match(peticion).then(function (guardado) {
-        if (guardado) return guardado;
-        if (peticion.mode === "navigate") return caches.match("./index.html");
-        return null;
-      });
+      return buscarEnCache(peticion);
     });
+}
+
+// Busca una respuesta en caché (con respaldo al index para navegación)
+function buscarEnCache(peticion) {
+  return caches.match(peticion).then(function (guardado) {
+    if (guardado) return guardado;
+
+    if (peticion.mode === "navigate") {
+      return caches.match("./index.html").then(function (inicio) {
+        return inicio || caches.match("./");
+      });
+    }
+
+    return null;
+  });
 }

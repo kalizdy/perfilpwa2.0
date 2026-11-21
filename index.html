@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mi Perfil — abriendo…</title>
-  <meta http-equiv="refresh" content="0; url=./fase-ui-pwa/">
-  <link rel="canonical" href="./fase-ui-pwa/">
   <style>
     body {
       margin: 0;
@@ -16,6 +14,7 @@
       background: #0b1220;
       color: #e8eef9;
       text-align: center;
+      padding: 20px;
     }
 
     a {
@@ -26,5 +25,29 @@
 </head>
 <body>
   <p>Abriendo el perfil… <a href="./fase-ui-pwa/">Entrar</a></p>
+
+  <script>
+    // Limpia el service worker y cachés de la versión anterior (raíz)
+    // y luego abre la PWA que vive en /fase-ui-pwa/.
+    (async function () {
+      try {
+        var raiz = new URL("./", location.href).href;
+
+        var registros = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registros
+          .filter(function (registro) { return registro.scope === raiz; })
+          .map(function (registro) { return registro.unregister(); }));
+
+        var nombres = await caches.keys();
+        await Promise.all(nombres
+          .filter(function (nombre) { return nombre.indexOf("perfil-pwa-v") === 0 && nombre !== "perfil-pwa-v6"; })
+          .map(function (nombre) { return caches.delete(nombre); }));
+      } catch (error) {
+        /* sin soporte de SW/caché: igual redirige */
+      }
+
+      location.replace("./fase-ui-pwa/");
+    })();
+  </script>
 </body>
 </html>
