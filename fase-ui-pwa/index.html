@@ -70,7 +70,7 @@
   <!-- Iconos de Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <!-- Mi hoja de estilos -->
-  <link rel="stylesheet" href="style.css?v=lobby42">
+  <link rel="stylesheet" href="style.css?v=lobby47">
 </head>
 <body>
 
@@ -78,7 +78,7 @@
 
   <!-- ================= ESCENARIO DE FONDO ================= -->
   <div class="fondo-escenario" aria-hidden="true">
-    <!-- Carrusel con los intereses: programación, mercados, cripto y videojuegos -->
+    <!-- Carrusel: intereses y fotos personales intercaladas -->
     <div class="fondo-carrusel" id="fondoCarrusel">
       <img class="activa"
            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=65"
@@ -86,21 +86,42 @@
                    https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=65 700w"
            sizes="100vw"
            alt="" decoding="async" fetchpriority="low">
+
+      <img class="retrato"
+           src="img/yo1-720.webp"
+           srcset="img/yo1-480.webp 480w, img/yo1-720.webp 720w"
+           sizes="100vw"
+           alt="" decoding="async" fetchpriority="low">
+
       <img src="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=700&q=65"
            srcset="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=420&q=60 420w,
                    https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=700&q=65 700w"
            sizes="100vw"
-           alt="" loading="lazy" decoding="async" fetchpriority="low">
+           alt="" decoding="async" fetchpriority="low">
+
+      <img class="cuadrada"
+           src="img/yo2-571.webp"
+           srcset="img/yo2-420.webp 420w, img/yo2-571.webp 571w"
+           sizes="100vw"
+           alt="" decoding="async" fetchpriority="low">
+
       <img src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=700&q=65"
            srcset="https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=420&q=60 420w,
                    https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=700&q=65 700w"
            sizes="100vw"
-           alt="" loading="lazy" decoding="async" fetchpriority="low">
+           alt="" decoding="async" fetchpriority="low">
+
+      <img class="grupo"
+           src="img/yo3-1400.webp"
+           srcset="img/yo3-700.webp 700w, img/yo3-1400.webp 1400w"
+           sizes="100vw"
+           alt="" decoding="async" fetchpriority="low">
+
       <img src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=700&q=65"
            srcset="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=420&q=60 420w,
                    https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=700&q=65 700w"
            sizes="100vw"
-           alt="" loading="lazy" decoding="async" fetchpriority="low">
+           alt="" decoding="async" fetchpriority="low">
     </div>
     <div class="fondo-tilt"></div>
     <div class="fondo-brillo"></div>
@@ -215,22 +236,24 @@
         <section id="pasatiempos" class="panel-seccion d-none">
           <h2 class="panel-titulo"><i class="bi bi-controller"></i>Pasatiempos</h2>
           <div class="tarjetas-mini">
-            <article class="mini-card">
+            <a class="mini-card" href="#juegos" data-panel="juegos" title="Ir a la sección Juegos">
               <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=400&h=400&q=70"
                    alt="Control de videojuegos con luces neón">
               <div class="mini-datos">
                 <h3>Videojuegos</h3>
                 <p>Dota 2, Fortnite y Mobile Legends con amigos.</p>
               </div>
-            </article>
-            <article class="mini-card">
+              <i class="bi bi-arrow-right mini-flecha" aria-hidden="true"></i>
+            </a>
+            <a class="mini-card" href="#musica" data-panel="musica" title="Ir a la sección Música">
               <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&h=400&q=70"
                    alt="Audífonos sobre un fondo amarillo">
               <div class="mini-datos">
                 <h3>Escuchar música</h3>
                 <p>Cumbia y playlists para todo el día.</p>
               </div>
-            </article>
+              <i class="bi bi-arrow-right mini-flecha" aria-hidden="true"></i>
+            </a>
           </div>
         </section>
 
@@ -238,30 +261,68 @@
         <section id="intereses" class="panel-seccion d-none">
           <h2 class="panel-titulo"><i class="bi bi-stars"></i>Intereses</h2>
           <div class="tarjetas-mini">
-            <article class="mini-card">
-              <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&h=400&q=70"
-                   alt="Laptop con código de programación">
-              <div class="mini-datos">
-                <h3>Programación</h3>
-                <p>HTML, CSS y Bootstrap por ahora.</p>
+            <details class="mini-card interes-card" name="intereses">
+              <summary class="interes-cabecera">
+                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&h=400&q=70"
+                     alt="Laptop con código de programación">
+                <div class="mini-datos">
+                  <h3>Programación</h3>
+                  <p>HTML, CSS y Bootstrap por ahora.</p>
+                </div>
+                <i class="bi bi-chevron-down interes-flecha" aria-hidden="true"></i>
+              </summary>
+              <div class="interes-detalle">
+                <p>Aprendo desarrollo web creando proyectos reales: este perfil es una PWA con service worker, validaciones y base de datos en Supabase.</p>
+                <ul>
+                  <li>Maquetación responsive (HTML, CSS, Bootstrap)</li>
+                  <li>JavaScript y manipulación del DOM</li>
+                  <li>PWA: instalación, caché y modo offline</li>
+                  <li>Supabase: base de datos en la nube</li>
+                </ul>
               </div>
-            </article>
-            <article class="mini-card">
-              <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=400&h=400&q=70"
-                   alt="Pantalla con un gráfico de precios de bolsa">
-              <div class="mini-datos">
-                <h3>Mercados financieros</h3>
-                <p>Gráficos, análisis y noticias del mercado.</p>
+            </details>
+
+            <details class="mini-card interes-card" name="intereses">
+              <summary class="interes-cabecera">
+                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1535320903710-d993d3d77d29?auto=format&fit=crop&w=400&h=400&q=70"
+                     alt="Pantalla con un gráfico de precios de bolsa">
+                <div class="mini-datos">
+                  <h3>Mercados financieros</h3>
+                  <p>Gráficos, análisis y noticias del mercado.</p>
+                </div>
+                <i class="bi bi-chevron-down interes-flecha" aria-hidden="true"></i>
+              </summary>
+              <div class="interes-detalle">
+                <p>Me gusta seguir gráficos, entender las noticias económicas y practicar análisis técnico sin arriesgar dinero real.</p>
+                <ul>
+                  <li>Lectura de velas y tendencias</li>
+                  <li>Soportes, resistencias e indicadores</li>
+                  <li>Gestión de riesgo</li>
+                  <li>Noticias macroeconómicas</li>
+                </ul>
               </div>
-            </article>
-            <article class="mini-card">
-              <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=400&h=400&q=70"
-                   alt="Celular mostrando el mercado de bitcoin y ethereum">
-              <div class="mini-datos">
-                <h3>Criptomonedas</h3>
-                <p>Noticias y tendencias del mundo cripto.</p>
+            </details>
+
+            <details class="mini-card interes-card" name="intereses">
+              <summary class="interes-cabecera">
+                <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=400&h=400&q=70"
+                     alt="Celular mostrando el mercado de bitcoin y ethereum">
+                <div class="mini-datos">
+                  <h3>Criptomonedas</h3>
+                  <p>Noticias y tendencias del mundo cripto.</p>
+                </div>
+                <i class="bi bi-chevron-down interes-flecha" aria-hidden="true"></i>
+              </summary>
+              <div class="interes-detalle">
+                <p>Sigo el ecosistema cripto: bitcoin, ethereum y las tendencias de adopción de la tecnología blockchain.</p>
+                <ul>
+                  <li>Bitcoin y Ethereum</li>
+                  <li>Wallets y seguridad</li>
+                  <li>Blockchain y descentralización</li>
+                  <li>Análisis on-chain</li>
+                </ul>
               </div>
-            </article>
+            </details>
           </div>
         </section>
 
@@ -325,36 +386,57 @@
 
           <p id="mensajeFiltroJuegos" class="mensaje-filtro" aria-live="polite"></p>
 
-          <div class="juegos-lista">
-            <a class="juego-card" data-tipo="MOBA" href="https://www.dota2.com/home"
-               target="_blank" rel="noopener" title="Abrir el sitio oficial de Dota 2">
+          <div class="juegos-lista" id="listaJuegos">
+            <article class="juego-card" data-tipo="MOBA">
               <img loading="lazy" decoding="async" src="https://cdn.cloudflare.steamstatic.com/steam/apps/570/header.jpg" alt="Dota 2">
               <div class="juego-datos">
                 <h3>Dota 2</h3>
                 <p>Estrategia y trabajo en equipo.</p>
+                <span class="juego-rango"><i class="bi bi-trophy-fill"></i> Legend V · 4 210 MMR</span>
               </div>
-              <i class="bi bi-box-arrow-up-right juego-externo" aria-hidden="true"></i>
-            </a>
+              <i class="bi bi-chevron-right juego-flecha" aria-hidden="true"></i>
+              <button type="button" class="juego-abrir" data-juego="dota"
+                      aria-label="Ver el historial y ranking de Dota 2"></button>
+            </article>
 
-            <a class="juego-card" data-tipo="Battle Royale" href="https://www.fortnite.com/"
-               target="_blank" rel="noopener" title="Abrir el sitio oficial de Fortnite">
+            <article class="juego-card" data-tipo="Battle Royale">
               <img loading="lazy" decoding="async" src="https://static.wikia.nocookie.net/fortnite/images/a/a5/Fortnite_Chapter_7-_Season_4_cover_image.jpg/revision/latest" alt="Fortnite">
               <div class="juego-datos">
                 <h3>Fortnite</h3>
                 <p>Battle royale con construcción y disparos.</p>
+                <span class="juego-rango"><i class="bi bi-trophy-fill"></i> Diamante II · Arena</span>
               </div>
-              <i class="bi bi-box-arrow-up-right juego-externo" aria-hidden="true"></i>
-            </a>
+              <i class="bi bi-chevron-right juego-flecha" aria-hidden="true"></i>
+              <button type="button" class="juego-abrir" data-juego="fortnite"
+                      aria-label="Ver el historial y ranking de Fortnite"></button>
+            </article>
 
-            <a class="juego-card" data-tipo="MOBA" href="https://www.mobilelegends.com/"
-               target="_blank" rel="noopener" title="Abrir el sitio oficial de Mobile Legends">
+            <article class="juego-card" data-tipo="MOBA">
               <img loading="lazy" decoding="async" src="https://akmweb.youngjoygame.com/web/gms/image/c3d1596795b86dc26e5f1ef2d48c3dfd.jpg" alt="Mobile Legends">
               <div class="juego-datos">
                 <h3>Mobile Legends</h3>
                 <p>MOBA para celular, partidas rápidas.</p>
+                <span class="juego-rango"><i class="bi bi-trophy-fill"></i> Mítico Honor · 4 320 pts</span>
               </div>
-              <i class="bi bi-box-arrow-up-right juego-externo" aria-hidden="true"></i>
-            </a>
+              <i class="bi bi-chevron-right juego-flecha" aria-hidden="true"></i>
+              <button type="button" class="juego-abrir" data-juego="mlbb"
+                      aria-label="Ver el historial y ranking de Mobile Legends"></button>
+            </article>
+          </div>
+
+          <!-- Detalle del perfil de cada juego -->
+          <div id="detalleJuego" class="detalle-juego d-none" aria-live="polite">
+            <button type="button" id="volverJuegos" class="btn-volver">
+              <i class="bi bi-arrow-left me-1"></i>Volver
+            </button>
+            <h3 id="tituloJuego" class="titulo-juego"></h3>
+            <p id="rangoJuego" class="rango-juego"></p>
+            <p id="actualizadoJuego" class="actualizado-juego"></p>
+            <div id="statsJuego" class="stats-juego"></div>
+            <h4 class="subtitulo-historial">Historial reciente</h4>
+            <ul id="historialJuego" class="lista-historial"></ul>
+            <a id="sitioJuego" class="panel-enlace" href="https://www.dota2.com/home"
+               target="_blank" rel="noopener">Visitar sitio oficial</a>
           </div>
         </section>
 
@@ -490,6 +572,6 @@
 </div><!-- /.lobby -->
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="script.js?v=lobby22"></script>
+  <script src="script.js?v=lobby24"></script>
 </body>
 </html>

@@ -905,12 +905,194 @@ function filtrarTemasDelArtista() {
   }
 }
 
+/* ---------- Perfiles de juego (historial de ejemplo) ---------- */
+var PERFILES_JUEGOS = {
+  dota: {
+    nombre: "Dota 2",
+    rango: "Legend V · 4 210 MMR",
+    actualizado: "Hoy · 11:20",
+    sitio: "https://www.dota2.com/home",
+    stats: [
+      { etiqueta: "Partidas", valor: "1 248" },
+      { etiqueta: "Victorias", valor: "56 %" },
+      { etiqueta: "KDA", valor: "3.4" },
+      { etiqueta: "Héroe favorito", valor: "Juggernaut" }
+    ],
+    historial: [
+      { resultado: "Victoria", detalle: "Juggernaut · 14/3/9", fecha: "Hoy", ganada: true },
+      { resultado: "Victoria", detalle: "Phantom Assassin · 11/2/7", fecha: "Hace 2 h", ganada: true },
+      { resultado: "Derrota", detalle: "Invoker · 6/8/4", fecha: "Ayer", ganada: false },
+      { resultado: "Victoria", detalle: "Mars · 9/5/15", fecha: "Ayer", ganada: true },
+      { resultado: "Derrota", detalle: "Anti-Mage · 4/7/3", fecha: "Hace 2 días", ganada: false },
+      { resultado: "Victoria", detalle: "Crystal Maiden · 5/4/21", fecha: "Hace 3 días", ganada: true }
+    ]
+  },
+  fortnite: {
+    nombre: "Fortnite",
+    rango: "Diamante II · Arena",
+    actualizado: "Hoy · 10:45",
+    sitio: "https://www.fortnite.com/",
+    stats: [
+      { etiqueta: "Victorias", valor: "312" },
+      { etiqueta: "Partidas", valor: "1 890" },
+      { etiqueta: "K/D", valor: "4.2" },
+      { etiqueta: "Winrate", valor: "18 %" }
+    ],
+    historial: [
+      { resultado: "#1", detalle: "Victory Royale · 9 eliminaciones", fecha: "Hoy", ganada: true },
+      { resultado: "#4", detalle: "6 eliminaciones", fecha: "Hace 1 h", ganada: false },
+      { resultado: "#1", detalle: "Victory Royale · 7 eliminaciones", fecha: "Hace 3 h", ganada: true },
+      { resultado: "#12", detalle: "2 eliminaciones", fecha: "Ayer", ganada: false },
+      { resultado: "#2", detalle: "5 eliminaciones", fecha: "Hace 2 días", ganada: false },
+      { resultado: "#1", detalle: "Victory Royale · 11 eliminaciones", fecha: "Hace 3 días", ganada: true }
+    ]
+  },
+  mlbb: {
+    nombre: "Mobile Legends",
+    rango: "Mítico Honor · 4 320 pts",
+    actualizado: "Ayer · 22:10",
+    sitio: "https://www.mobilelegends.com/",
+    stats: [
+      { etiqueta: "Partidas", valor: "2 105" },
+      { etiqueta: "Winrate", valor: "58.4 %" },
+      { etiqueta: "KDA", valor: "3.9" },
+      { etiqueta: "Héroe favorito", valor: "Gusion" }
+    ],
+    historial: [
+      { resultado: "Victoria", detalle: "MVP · Gusion 12/2/8", fecha: "Hoy", ganada: true },
+      { resultado: "Derrota", detalle: "Ling 4/6/3", fecha: "Hace 2 h", ganada: false },
+      { resultado: "Victoria", detalle: "Khufra 3/1/17", fecha: "Ayer", ganada: true },
+      { resultado: "Victoria", detalle: "MVP · Gusion 15/3/6", fecha: "Ayer", ganada: true },
+      { resultado: "Derrota", detalle: "Fanny 7/9/2", fecha: "Hace 2 días", ganada: false },
+      { resultado: "Victoria", detalle: "Guinevere 9/2/11", fecha: "Hace 3 días", ganada: true }
+    ]
+  }
+};
+
+function crearStatJuego(stat) {
+  var caja = document.createElement("div");
+  caja.className = "stat-juego";
+
+  var valor = document.createElement("span");
+  valor.className = "stat-valor";
+  valor.textContent = stat.valor;
+
+  var etiqueta = document.createElement("span");
+  etiqueta.className = "stat-etiqueta";
+  etiqueta.textContent = stat.etiqueta;
+
+  caja.appendChild(valor);
+  caja.appendChild(etiqueta);
+  return caja;
+}
+
+function mostrarHistorialJuego(clave) {
+  var perfil = PERFILES_JUEGOS[clave];
+  if (!perfil) return;
+
+  var lista = document.getElementById("listaJuegos");
+  var detalle = document.getElementById("detalleJuego");
+  var mensaje = document.getElementById("mensajeFiltroJuegos");
+
+  if (lista) lista.classList.add("d-none");
+  if (mensaje) mensaje.classList.add("d-none");
+  if (detalle) detalle.classList.remove("d-none");
+
+  document.getElementById("tituloJuego").textContent = perfil.nombre;
+
+  var rango = document.getElementById("rangoJuego");
+  rango.textContent = "";
+  var copa = document.createElement("i");
+  copa.className = "bi bi-trophy-fill";
+  copa.setAttribute("aria-hidden", "true");
+  rango.appendChild(copa);
+  rango.appendChild(document.createTextNode(" " + perfil.rango));
+
+  var actualizado = document.getElementById("actualizadoJuego");
+  if (actualizado) {
+    actualizado.textContent = "";
+    var reloj = document.createElement("i");
+    reloj.className = "bi bi-clock-history";
+    reloj.setAttribute("aria-hidden", "true");
+    actualizado.appendChild(reloj);
+    actualizado.appendChild(document.createTextNode(" Última actualización: " + perfil.actualizado));
+  }
+
+  var stats = document.getElementById("statsJuego");
+  stats.textContent = "";
+  perfil.stats.forEach(function (stat) {
+    stats.appendChild(crearStatJuego(stat));
+  });
+
+  var historial = document.getElementById("historialJuego");
+  historial.textContent = "";
+  perfil.historial.forEach(function (partida) {
+    var item = document.createElement("li");
+    item.className = "historial-item";
+
+    var resultado = document.createElement("span");
+    resultado.className = "historial-resultado " + (partida.ganada ? "ganada" : "perdida");
+    resultado.textContent = partida.resultado;
+
+    var detallePartida = document.createElement("span");
+    detallePartida.className = "historial-detalle";
+    detallePartida.textContent = partida.detalle;
+
+    var fecha = document.createElement("span");
+    fecha.className = "historial-fecha";
+    fecha.textContent = partida.fecha;
+
+    item.appendChild(resultado);
+    item.appendChild(detallePartida);
+    item.appendChild(fecha);
+    historial.appendChild(item);
+  });
+
+  var sitio = document.getElementById("sitioJuego");
+  if (sitio) sitio.href = perfil.sitio;
+
+  var scroll = document.querySelector(".panel-scroll");
+  if (scroll) scroll.scrollTop = 0;
+}
+
+function mostrarListaJuegos() {
+  var detalle = document.getElementById("detalleJuego");
+  var lista = document.getElementById("listaJuegos");
+  var mensaje = document.getElementById("mensajeFiltroJuegos");
+
+  if (detalle) detalle.classList.add("d-none");
+  if (lista) lista.classList.remove("d-none");
+  if (mensaje) mensaje.classList.remove("d-none");
+}
+
 /* ---------- Filtro de juegos por tipo ---------- */
 function prepararFiltroJuegos() {
   var filtro = document.getElementById("filtroTipoJuego");
   if (!filtro) return;
 
-  filtro.addEventListener("change", filtrarJuegos);
+  filtro.addEventListener("change", function () {
+    mostrarListaJuegos();
+    filtrarJuegos();
+  });
+
+  // Delegación: un solo escuchador para las tres tarjetas de juego
+  var lista = document.getElementById("listaJuegos");
+  if (lista) {
+    lista.addEventListener("click", function (evento) {
+      if (!(evento.target instanceof Element)) return;
+
+      var boton = evento.target.closest(".juego-abrir");
+      if (!boton) return;
+
+      mostrarHistorialJuego(boton.dataset.juego);
+    });
+  }
+
+  var volver = document.getElementById("volverJuegos");
+  if (volver) {
+    volver.addEventListener("click", mostrarListaJuegos);
+  }
+
   filtrarJuegos();
 }
 

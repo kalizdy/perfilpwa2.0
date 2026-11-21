@@ -29,8 +29,7 @@ El proyecto evolucionó desde una página de perfil tradicional (navbar + carrus
 
 Todos los archivos de la PWA viven dentro de la subcarpeta **`fase-ui-pwa/`** del repositorio (tal como pide la guía). La raíz del repositorio solo contiene un `index.html` que redirige a esa carpeta.
 
-| Archivo | Rol |
-|---|---|
+| Archivo | Rol ||---|---|
 | `index.html` | Estructura del lobby: barra superior, rail de 6 secciones, escenario central, panel flotante, barra inferior y avisos. Incluye las metas PWA. |
 | `style.css` | Diseño completo: variables de marca, estética cristal/dorado, 3 modos responsive, estados de foco, tema claro/oscuro, estados de hidratación y red. |
 | `script.js` | Toda la lógica: hidratación, secciones, catálogo musical (90 canciones), filtros de juegos, validación del formulario, tema, instalación, cola offline y detector de red. |
@@ -45,11 +44,11 @@ Todos los archivos de la PWA viven dentro de la subcarpeta **`fase-ui-pwa/`** de
 
 | Sección | Contenido y funciones |
 |---|---|
-| **Pasatiempos** | Tarjetas con imagen de videojuegos y música. |
-| **Intereses** | Programación, mercados financieros y criptomonedas. |
+| **Pasatiempos** | Tarjetas con imagen de videojuegos y música; cada tarjeta **lleva a su sección** (Juegos / Música). |
+| **Intereses** | Programación, mercados financieros y criptomonedas. Cada tarjeta se **despliega al tocarla** y muestra una descripción ampliada con temas concretos (acordeón accesible, uno a la vez). |
 | **Horario** | Hoja de Google Sheets embebida + botón "Abrir hoja" (URL real, pestaña nueva). |
 | **Música** | Catálogo de **90 canciones** con 9 artistas: filtro por género, búsqueda en vivo por artista/canción, vista de detalle con lista de temas y botón "Volver". **Cada canción abre YouTube** (búsqueda exacta "artista + título") en una pestaña nueva. |
-| **Juegos** | Dota 2, Fortnite y Mobile Legends con filtro por tipo (MOBA / Battle Royale). Cada tarjeta abre el **sitio oficial** del juego en una pestaña nueva. |
+| **Juegos** | Dota 2, Fortnite y Mobile Legends con filtro por tipo (MOBA / Battle Royale). Al tocar una tarjeta **no sale del perfil**: abre su **historial** con rango, última actualización, estadísticas y últimas partidas de ejemplo. |
 | **Contacto** | Formulario de 6 campos con validación en tiempo real, filtro de caracteres, contador 0/300, resumen del mensaje y botones de envío por WhatsApp/correo. Cada mensaje se guarda además en **Supabase** (base de datos en la nube). |
 
 ### 1.5 Patrones técnicos destacados
@@ -66,7 +65,7 @@ Todos los archivos de la PWA viven dentro de la subcarpeta **`fase-ui-pwa/`** de
 
 La pantalla se organiza como un **lobby de videojuego**:
 
-- **Escenario de fondo**: **carrusel automático** (fundido cada 6 s) con imágenes de sus **intereses reales** (programación, mercados financieros, criptomonedas y videojuegos), con degradados y brillo para mantener la legibilidad; se adapta al tema claro/oscuro y respeta "reducir movimiento".
+- **Escenario de fondo**: **carrusel automático** (fundido cada 6 s) que **intercala** imágenes de sus **intereses reales** (programación, mercados financieros, criptomonedas y videojuegos) con **tres fotos personales** optimizadas en WebP, con degradados y brillo para mantener la legibilidad; se adapta al tema claro/oscuro y respeta "reducir movimiento".
 - **Personaje central**: foto con marco luminoso y placa con nombre y lema ("Tecnología • Mercados financieros • Música").
 - **Barra superior**: avatar, nombre y **barra de carrera "Estudiante de Ingeniería de Sistemas"** con una **barra de avance visual** (sin escribir el semestre), saludo dinámico según la hora y acciones (instalar, tema, menú).
 - **Rail lateral** con 6 iconos: Pasatiempos, Intereses, Horario, Música, Juegos y Contacto (destacado en dorado).

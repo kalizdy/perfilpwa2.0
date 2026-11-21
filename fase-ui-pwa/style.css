@@ -100,6 +100,19 @@ h1, h2, h3,
   opacity: 0.93;
 }
 
+/* Encuadre de las fotos personales dentro del carrusel */
+.fondo-carrusel img.retrato {
+  object-position: center 26%;
+}
+
+.fondo-carrusel img.cuadrada {
+  object-position: center 32%;
+}
+
+.fondo-carrusel img.grupo {
+  object-position: center 38%;
+}
+
 /* Si el sistema pide menos movimiento, sin fundidos */
 @media (prefers-reduced-motion: reduce) {
   .fondo-carrusel img {
@@ -628,7 +641,31 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   border: 1px solid var(--borde);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
   transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.mini-card:focus-visible {
+  outline: 2px solid var(--marca-2);
+  outline-offset: 2px;
+}
+
+.mini-datos {
+  flex: 1 1 auto;
+}
+
+/* Flecha que indica que la tarjeta lleva a otra sección */
+.mini-flecha {
+  flex: 0 0 auto;
+  font-size: 0.9rem;
+  color: var(--marca);
+  opacity: 0.8;
+}
+
+[data-bs-theme="dark"] .mini-flecha {
+  color: #67e8f9;
 }
 
 [data-bs-theme="dark"] .mini-card {
@@ -661,6 +698,68 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   font-size: 0.78rem;
   color: var(--suave);
   line-height: 1.35;
+}
+
+/* Tarjetas de intereses desplegables (al tocar muestran su contenido) */
+.interes-card {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+}
+
+.interes-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  cursor: pointer;
+  list-style: none;
+}
+
+/* Oculta el triángulo nativo del navegador */
+.interes-cabecera::-webkit-details-marker {
+  display: none;
+}
+
+.interes-cabecera:focus-visible {
+  outline: 2px solid var(--marca-2);
+  outline-offset: -2px;
+}
+
+.interes-flecha {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  color: var(--marca);
+  transition: transform 0.25s ease;
+}
+
+[data-bs-theme="dark"] .interes-flecha {
+  color: #67e8f9;
+}
+
+.interes-card[open] .interes-flecha {
+  transform: rotate(180deg);
+}
+
+.interes-detalle {
+  padding: 0 12px 12px 80px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--suave);
+}
+
+.interes-detalle p {
+  margin: 0 0 6px;
+}
+
+.interes-detalle ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.interes-detalle li {
+  margin-bottom: 2px;
 }
 
 /* Horario */
@@ -834,34 +933,12 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 10px;
   border: 1px solid var(--borde);
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.65);
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
   transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-}
-
-.juego-card:focus-visible {
-  outline: 2px solid var(--marca-2);
-  outline-offset: 2px;
-}
-
-/* Icono que indica que la tarjeta abre un sitio externo */
-.juego-externo {
-  position: absolute;
-  top: 7px;
-  right: 9px;
-  font-size: 0.7rem;
-  color: var(--marca);
-  opacity: 0.75;
-}
-
-[data-bs-theme="dark"] .juego-externo {
-  color: #67e8f9;
 }
 
 [data-bs-theme="dark"] .juego-card {
@@ -872,6 +949,199 @@ body:not([data-bs-theme="dark"]) .fondo-tilt {
   transform: translateY(-2px);
   border-color: rgba(37, 99, 235, 0.45);
   box-shadow: 0 10px 22px rgba(2, 8, 20, 0.18);
+}
+
+/* Toda la tarjeta abre el historial: botón invisible encima */
+.juego-abrir {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  padding: 0;
+  border-radius: 14px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.juego-abrir:focus-visible {
+  outline: 2px solid var(--marca-2);
+  outline-offset: 2px;
+}
+
+/* Flecha decorativa que indica "abrir historial" */
+.juego-flecha {
+  flex: 0 0 auto;
+  align-self: center;
+  font-size: 1rem;
+  color: var(--marca);
+  opacity: 0.85;
+}
+
+[data-bs-theme="dark"] .juego-flecha {
+  color: #67e8f9;
+}
+
+/* Rango del perfil dentro de la tarjeta */
+.juego-rango {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--marca);
+}
+
+.juego-rango i {
+  font-size: 0.62rem;
+  color: #c98a1a;
+}
+
+[data-bs-theme="dark"] .juego-rango {
+  color: #67e8f9;
+}
+
+/* Última actualización del historial */
+.actualizado-juego {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 10px;
+  font-size: 0.68rem;
+  color: var(--suave);
+}
+
+/* ----- Detalle del perfil del juego ----- */
+.detalle-juego {
+  padding-top: 2px;
+}
+
+.titulo-juego {
+  margin: 0 0 2px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--tinta);
+}
+
+.rango-juego {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--marca);
+}
+
+.rango-juego i {
+  color: #c98a1a;
+}
+
+[data-bs-theme="dark"] .rango-juego {
+  color: #67e8f9;
+}
+
+.stats-juego {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-juego {
+  padding: 8px 10px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+[data-bs-theme="dark"] .stat-juego {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stat-valor {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--tinta);
+}
+
+.stat-etiqueta {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--suave);
+}
+
+.subtitulo-historial {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  color: var(--tinta);
+}
+
+.lista-historial {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.historial-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 0.72rem;
+}
+
+[data-bs-theme="dark"] .historial-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.historial-resultado {
+  flex: 0 0 auto;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.historial-resultado.ganada {
+  background: rgba(22, 101, 52, 0.14);
+  color: #166534;
+}
+
+.historial-resultado.perdida {
+  background: rgba(185, 28, 28, 0.14);
+  color: #b91c1c;
+}
+
+[data-bs-theme="dark"] .historial-resultado.ganada {
+  background: rgba(25, 135, 84, 0.22);
+  color: #75dfa9;
+}
+
+[data-bs-theme="dark"] .historial-resultado.perdida {
+  background: rgba(220, 53, 69, 0.22);
+  color: #fca5a5;
+}
+
+.historial-detalle {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--suave);
+}
+
+.historial-fecha {
+  flex: 0 0 auto;
+  font-size: 0.64rem;
+  color: var(--suave);
+  white-space: nowrap;
 }
 
 .juego-card img {
