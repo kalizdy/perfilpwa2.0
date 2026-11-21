@@ -4,7 +4,7 @@
 **Materia:** Diseño Web II — Carrera de Ingeniería
 **Docente:** Ing. Miguel · UPDS Sede La Paz
 **Fecha:** Noviembre de 2026
-**Sitio publicado:** https://kalizdy.github.io/perfilpwa2.0/
+**Sitio publicado:** https://kalizdy.github.io/perfilpwa2.0/fase-ui-pwa/
 **Tecnologías:** HTML5, CSS3, Bootstrap 5, JavaScript (vanilla), Web App Manifest, Service Worker, Cache Storage, LocalStorage
 
 ---
@@ -26,6 +26,8 @@ El proyecto evolucionó desde una página de perfil tradicional (navbar + carrus
 5. Publicar el resultado en GitHub Pages como entregable verificable.
 
 ### 1.3 Arquitectura de archivos
+
+Todos los archivos de la PWA viven dentro de la subcarpeta **`fase-ui-pwa/`** del repositorio (tal como pide la guía). La raíz del repositorio solo contiene un `index.html` que redirige a esa carpeta.
 
 | Archivo | Rol |
 |---|---|
@@ -205,7 +207,7 @@ El chip de red es la versión en JavaScript puro del ejemplo jQuery de la guía 
 
 ### 3.7 Limitaciones conocidas
 
-- Abrir `index.html` con doble clic (`file://`) bloquea el manifest y el service worker por CORS: es una restricción del navegador. Para probar la PWA se usa el servidor local (`http://127.0.0.1:8123`) o el sitio publicado.
+- Abrir `index.html` con doble clic (`file://`) bloquea el manifest y el service worker por CORS: es una restricción del navegador. Para probar la PWA se usa el servidor local (`http://127.0.0.1:8123/fase-ui-pwa/`) o el sitio publicado.
 - Los botones de WhatsApp y correo del resumen permanecen ocultos hasta completar `CORREO_CONTACTO` y `WHATSAPP_CONTACTO` en `script.js`.
 - El envío a Supabase requiere que la tabla `mensajes_contacto` exista con sus políticas RLS (insertar para `anon`); si no está creada, los mensajes quedan en cola y se reintentan.
 
@@ -252,8 +254,8 @@ El formulario de contacto se conecta a una base de datos PostgreSQL alojada en *
 
 ## Anexo A — Cómo probar el proyecto
 
-1. **Local con servidor:** `python -m http.server 8123` en la carpeta del proyecto y abrir `http://127.0.0.1:8123`.
-2. **En línea:** https://kalizdy.github.io/perfilpwa2.0/
+1. **Local con servidor:** `python -m http.server 8123` en la carpeta del proyecto y abrir `http://127.0.0.1:8123/fase-ui-pwa/`.
+2. **En línea:** https://kalizdy.github.io/perfilpwa2.0/fase-ui-pwa/
 3. **Hidratación:** `document.getElementById("panelLateral").dataset.hidratado` → `"true"` (proceso interno, sin botón visible).
 4. **Offline:** DevTools → *Network* → *Offline* → recargar → la app abre completa; enviar el formulario y reconectar para ver la sincronización.
 5. **Instalación:** botón ⬇ (aparece cuando el navegador lo permite) o menú del navegador → "Instalar aplicación".
